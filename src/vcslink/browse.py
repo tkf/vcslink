@@ -47,8 +47,9 @@ def cli_log(app, weburl, revision):
     app.open_url(url)
 
 
-def cli_file(app, weburl, **kwargs):
-    url = weburl.file(**kwargs)
+def cli_file(app, weburl, permalink, **kwargs):
+    _permalink = {"auto": None, "yes": True, "no": False}[permalink]
+    url = weburl.file(permalink=_permalink, **kwargs)
     app.open_url(url)
 
 
@@ -87,9 +88,10 @@ def make_parser(doc=__doc__):
     p.add_argument("revision", nargs="?")
 
     p = subp("file", cli_file)
+    p.add_argument("--permalink", default="auto", choices=("auto", "yes", "no"))
     p.add_argument("file")
     p.add_argument("lines", nargs="?")
-    p.add_argument("revision", nargs="?", default="HEAD")
+    p.add_argument("revision", nargs="?", default="master")
 
     parser.set_defaults(func=cli_auto)
     return parser

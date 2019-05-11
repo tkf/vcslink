@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Optional
 
 
 def rooturl(url):
@@ -97,7 +98,19 @@ class WebURL:
 
         return f"#{fragment}"
 
-    def file(self, file, lines=None, revision="master"):
+    def file(
+        self,
+        file,
+        lines: Optional[str] = None,
+        revision: str = "master",
+        permalink: Optional[bool] = None,
+    ):
+        if permalink is None:
+            permalink = bool(lines)
+        if permalink:
+            revision = self.repo.git_revision(revision)
+        else:
+            revision = "master"
         path = Path(file)
         relpath = path.absolute().relative_to(self.repo.root)
         assert not str(relpath).startswith("..")
