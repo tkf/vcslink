@@ -15,8 +15,9 @@ def open_url(dry_run, url):
 
 def cli_auto(dry_run):
     repo = GitRepoAnalyzer.from_path(".")
-    if repo.need_pr():
-        url = repo.weburl.pr()
+    branch = repo.current_branch()
+    if repo.need_pr(branch):
+        url = repo.weburl.pr(branch)
     else:
         url = repo.weburl.root
     open_url(dry_run, url)

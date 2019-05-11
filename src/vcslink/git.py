@@ -36,6 +36,9 @@ class GitRepoAnalyzer:
     def git_config(self, config):
         return self.git("config", "--get", config).stdout.rstrip()
 
+    def git_revision(self, revision):
+        return self.git("rev-parse", "--verify", revision).stdout.strip()
+
     @staticmethod
     def choose_url(url_list):
         for host in ["gitlab", "github", "bitbucket"]:
@@ -52,3 +55,11 @@ class GitRepoAnalyzer:
 
     def remote_url(self, **kwargs):
         return self.choose_url(self.remote_all_urls(**kwargs))
+
+    def current_branch(self):
+        return self.git("rev-parse", "--abbrev-ref", "HEAD").stdout.rstrip()
+
+    def need_pr(self, branch):
+        return not (
+            branch == "master" and self.git_config(f"branch.master.remote") == "origin"
+        )

@@ -66,7 +66,26 @@ class WebURL:
     def is_github(self):
         return "//github.com" in self.rooturl
 
-    def format_lines(self, lines):
+    def pr(self, branch):
+        if self.is_github():
+            # https://github.com/{user}/{repo}/pull/new/{branch}
+            return self.rooturl + "/pull/new/" + branch
+        raise NotImplementedError
+
+    def commit(self, revision):
+        revision = self.repo.git_revision(revision)
+        if self.is_bitbucket():
+            return f"{self.rooturl}/commits/{revision}"
+        else:
+            return f"{self.rooturl}/commit/{revision}"
+
+    def log(self, branch):
+        if self.is_bitbucket():
+            return f"{self.rooturl}/commits/branch/{branch}"
+        else:
+            return f"{self.rooturl}/commits/{branch}"
+
+    def _format_lines(self, lines):
         if not lines:
             return ""
 
@@ -85,7 +104,7 @@ class WebURL:
         relpath = path.absolute().relative_to(self.repo.root)
         assert not str(relpath).startswith("..")
         relurl = "/".join(relpath.parts)
-        fragment = self.format_lines(lines)
+        fragment = self._format_lines(lines)
         if self.is_bitbucket():
             return f"{self.rooturl}/src/{revision}/{relurl}{fragment}"
         else:
