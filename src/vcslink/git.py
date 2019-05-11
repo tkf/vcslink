@@ -15,7 +15,6 @@ class GitRepoAnalyzer:
     def __init__(self, cwd):
         self.cwd = Path(cwd)
         self.root = self.git("rev-parse", "--show-toplevel").stdout.strip()
-        self.weburl = WebURL(self)
 
     def run(self, *args, **options):
         kwargs = dict(
@@ -63,3 +62,23 @@ class GitRepoAnalyzer:
         return not (
             branch == "master" and self.git_config(f"branch.master.remote") == "origin"
         )
+
+    def local_branch(self, **kwargs):
+        return LocalBranch(self, **kwargs)
+
+
+class LocalBranch:
+    def __init__(self, repo, name=None):
+        self.repo = repo
+        if name is None:
+            name = repo.current_branch()
+        self.name = name
+
+    def remote_url(self):
+        return self.repo.remote_url(branch=self.name)
+
+    def need_pr(self):
+        return self.repo.need_pr(self.name)
+
+    def weburl(self, **kwargs):
+        return WebURL(self, **kwargs)

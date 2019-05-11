@@ -47,15 +47,10 @@ def _specialurl(url):
 
 
 class WebURL:
-    @classmethod
-    def from_path(cls, path):
-        from .git import GitRepoAnalyzer
-
-        return cls(GitRepoAnalyzer.from_path(path))
-
-    def __init__(self, repo, branch="master"):
-        self.repo = repo
-        self.rooturl = rooturl(self.repo.remote_url(branch=branch))
+    def __init__(self, local_branch):
+        self.local_branch = local_branch
+        self.repo = local_branch.repo
+        self.rooturl = rooturl(local_branch.remote_url())
 
     def is_bitbucket(self):
         return "//bitbucket.org" in self.rooturl
@@ -66,7 +61,8 @@ class WebURL:
     def is_github(self):
         return "//github.com" in self.rooturl
 
-    def pr(self, branch):
+    def pr(self):
+        branch = self.local_branch.name
         if self.is_github():
             # https://github.com/{user}/{repo}/pull/new/{branch}
             return self.rooturl + "/pull/new/" + branch
@@ -79,7 +75,9 @@ class WebURL:
         else:
             return f"{self.rooturl}/commit/{revision}"
 
-    def log(self, branch):
+    def log(self, branch=None):
+        if not branch:
+            branch = self.local_branch.name
         if self.is_bitbucket():
             return f"{self.rooturl}/commits/branch/{branch}"
         else:

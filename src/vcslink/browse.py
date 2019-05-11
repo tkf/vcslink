@@ -6,7 +6,7 @@ import webbrowser
 from dataclasses import dataclass
 from typing import List
 
-from .git import GitRepoAnalyzer
+from .api import analyze
 
 
 @dataclass
@@ -17,7 +17,8 @@ class Application:
     @classmethod
     def run(cls, dry_run, browser, func, **kwargs):
         browser_cmd = shlex.split(browser) if browser else []
-        return func(cls(dry_run=dry_run, browser=browser_cmd), **kwargs)
+        weburl = analyze(path=".")
+        return func(cls(dry_run=dry_run, browser=browser_cmd), weburl=weburl, **kwargs)
 
     def open_url(self, url):
         if self.dry_run:
@@ -28,31 +29,26 @@ class Application:
             webbrowser.open(url)
 
 
-def cli_auto(app):
-    repo = GitRepoAnalyzer.from_path(".")
-    branch = repo.current_branch()
-    if repo.need_pr(branch):
-        url = repo.weburl.pr(branch)
+def cli_auto(app, weburl):
+    if weburl.local_branch.need_pr():
+        url = weburl.pr()
     else:
-        url = repo.weburl.root
+        url = weburl.rooturl
     app.open_url(url)
 
 
-def cli_commit(app, revision):
-    repo = GitRepoAnalyzer.from_path(".")
-    url = repo.weburl.commit(revision)
+def cli_commit(app, weburl, revision):
+    url = weburl.commit(revision)
     app.open_url(url)
 
 
-def cli_log(app, revision):
-    repo = GitRepoAnalyzer.from_path(".")
-    url = repo.weburl.log(revision)
+def cli_log(app, weburl, revision):
+    url = weburl.log(revision)
     app.open_url(url)
 
 
-def cli_file(app, **kwargs):
-    repo = GitRepoAnalyzer.from_path(".")
-    url = repo.weburl.file(**kwargs)
+def cli_file(app, weburl, **kwargs):
+    url = weburl.file(**kwargs)
     app.open_url(url)
 
 
@@ -88,7 +84,7 @@ def make_parser(doc=__doc__):
     p.add_argument("revision", nargs="?", default="HEAD")
 
     p = subp("log", cli_log)
-    p.add_argument("revision", nargs="?", default="HEAD")
+    p.add_argument("revision", nargs="?")
 
     p = subp("file", cli_file)
     p.add_argument("file")
