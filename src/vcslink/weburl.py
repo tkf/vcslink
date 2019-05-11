@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 from typing import TYPE_CHECKING, Optional, Tuple, Union
 
@@ -28,10 +29,9 @@ def rooturl(url):
 
 
 def _rooturl(url):
-    if url.startswith("http"):
-        if url.endswith(".git"):
-            return url[: -len(".git")]
-        return url
+    match = re.match(r"^https?://(.*?)(.git)?$", url)
+    if match:
+        return f"https://{match.group(1)}"
     if "@" not in url:
         raise ValueError(f"Unsupported URL: {url}")
     _, web = url.split("@", 1)
