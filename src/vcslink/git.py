@@ -1,12 +1,18 @@
 import subprocess
 from pathlib import Path
+from typing import Optional, Union
 
 from .weburl import WebURL
 
+Pathish = Union[str, Path]
+
 
 class GitRepoAnalyzer:
+    cwd: Path
+    root: Path
+
     @classmethod
-    def from_path(cls, path):
+    def from_path(cls, path: Pathish) -> "GitRepoAnalyzer":
         cwd = Path(path)
         if not cwd.is_dir():
             cwd = cwd.parent
@@ -14,7 +20,7 @@ class GitRepoAnalyzer:
 
     def __init__(self, cwd):
         self.cwd = Path(cwd)
-        self.root = self.git("rev-parse", "--show-toplevel").stdout.strip()
+        self.root = Path(self.git("rev-parse", "--show-toplevel").stdout.strip())
 
     def run(self, *args, **options):
         kwargs = dict(
@@ -68,17 +74,20 @@ class GitRepoAnalyzer:
 
 
 class LocalBranch:
-    def __init__(self, repo, name=None):
+    repo: GitRepoAnalyzer
+    name: str
+
+    def __init__(self, repo: GitRepoAnalyzer, name: Optional[str] = None):
         self.repo = repo
         if name is None:
             name = repo.current_branch()
         self.name = name
 
-    def remote_url(self):
+    def remote_url(self) -> str:
         return self.repo.remote_url(branch=self.name)
 
-    def need_pr(self):
+    def need_pr(self) -> bool:
         return self.repo.need_pr(self.name)
 
-    def weburl(self, **kwargs):
-        return WebURL(self, **kwargs)
+    def weburl(self) -> WebURL:
+        return WebURL(self)

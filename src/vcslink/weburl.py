@@ -78,14 +78,14 @@ class WebURL:
             return self.rooturl + "/pull/new/" + branch
         raise NotImplementedError
 
-    def commit(self, revision: str):
+    def commit(self, revision: str) -> str:
         revision = self.repo.git_revision(revision)
         if self.is_bitbucket():
             return f"{self.rooturl}/commits/{revision}"
         else:
             return f"{self.rooturl}/commit/{revision}"
 
-    def log(self, branch: Optional[str] = None):
+    def log(self, branch: Optional[str] = None) -> str:
         if not branch:
             branch = self.local_branch.name
         if self.is_bitbucket():
@@ -93,7 +93,7 @@ class WebURL:
         else:
             return f"{self.rooturl}/commits/{branch}"
 
-    def _format_lines(self, lines: Optional[str]):
+    def _format_lines(self, lines: Optional[str]) -> str:
         if not lines:
             return ""
 
@@ -113,7 +113,7 @@ class WebURL:
         lines: Optional[str] = None,
         revision: str = "master",
         permalink: Optional[bool] = None,
-    ):
+    ) -> str:
         if permalink is None:
             permalink = bool(lines)
         if permalink:

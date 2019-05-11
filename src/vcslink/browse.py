@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from typing import List
 
 from .api import analyze
+from .weburl import WebURL
 
 
 @dataclass
@@ -29,7 +30,7 @@ class Application:
             webbrowser.open(url)
 
 
-def cli_auto(app, weburl):
+def cli_auto(app: Application, weburl: WebURL):
     if weburl.local_branch.need_pr():
         url = weburl.pr()
     else:
@@ -37,17 +38,17 @@ def cli_auto(app, weburl):
     app.open_url(url)
 
 
-def cli_commit(app, weburl, revision):
+def cli_commit(app: Application, weburl: WebURL, revision):
     url = weburl.commit(revision)
     app.open_url(url)
 
 
-def cli_log(app, weburl, revision):
+def cli_log(app: Application, weburl: WebURL, revision):
     url = weburl.log(revision)
     app.open_url(url)
 
 
-def cli_file(app, weburl, permalink, **kwargs):
+def cli_file(app: Application, weburl: WebURL, permalink, **kwargs):
     _permalink = {"auto": None, "yes": True, "no": False}[permalink]
     url = weburl.file(permalink=_permalink, **kwargs)
     app.open_url(url)
