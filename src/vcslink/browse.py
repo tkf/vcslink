@@ -2,43 +2,52 @@ import argparse
 import subprocess
 import sys
 import webbrowser
+from dataclasses import dataclass
 
 from .git import GitRepoAnalyzer
 
 
-def open_url(dry_run, url):
-    if dry_run:
-        print("Open:", url)
-    else:
-        webbrowser.open(url)
+@dataclass
+class Application:
+    dry_run: bool
+
+    @classmethod
+    def run(cls, dry_run, func, **kwargs):
+        return func(cls(dry_run=dry_run), **kwargs)
+
+    def open_url(self, url):
+        if self.dry_run:
+            print("Open:", url)
+        else:
+            webbrowser.open(url)
 
 
-def cli_auto(dry_run):
+def cli_auto(app):
     repo = GitRepoAnalyzer.from_path(".")
     branch = repo.current_branch()
     if repo.need_pr(branch):
         url = repo.weburl.pr(branch)
     else:
         url = repo.weburl.root
-    open_url(dry_run, url)
+    app.open_url(url)
 
 
-def cli_commit(dry_run, revision):
+def cli_commit(app, revision):
     repo = GitRepoAnalyzer.from_path(".")
     url = repo.weburl.commit(revision)
-    open_url(dry_run, url)
+    app.open_url(url)
 
 
-def cli_log(dry_run, revision):
+def cli_log(app, revision):
     repo = GitRepoAnalyzer.from_path(".")
     url = repo.weburl.log(revision)
-    open_url(dry_run, url)
+    app.open_url(url)
 
 
-def cli_file(dry_run, **kwargs):
+def cli_file(app, **kwargs):
     repo = GitRepoAnalyzer.from_path(".")
     url = repo.weburl.file(**kwargs)
-    open_url(dry_run, url)
+    app.open_url(url)
 
 
 class CustomFormatter(
@@ -96,7 +105,7 @@ def main(args=None):
     parser = make_parser()
     ns = parser.parse_args(args)
     try:
-        (lambda func, **kwds: func(**kwds))(**vars(ns))
+        Application.run(**vars(ns))
     except subprocess.CalledProcessError as err:
         print(err, file=sys.stderr)
         print_outputs(err)
