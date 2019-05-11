@@ -1,8 +1,10 @@
 import argparse
+import shlex
 import subprocess
 import sys
 import webbrowser
 from dataclasses import dataclass
+from typing import List
 
 from .git import GitRepoAnalyzer
 
@@ -10,14 +12,18 @@ from .git import GitRepoAnalyzer
 @dataclass
 class Application:
     dry_run: bool
+    browser: List[str]
 
     @classmethod
-    def run(cls, dry_run, func, **kwargs):
-        return func(cls(dry_run=dry_run), **kwargs)
+    def run(cls, dry_run, browser, func, **kwargs):
+        browser_cmd = shlex.split(browser) if browser else []
+        return func(cls(dry_run=dry_run, browser=browser_cmd), **kwargs)
 
     def open_url(self, url):
         if self.dry_run:
             print("Open:", url)
+        elif self.browser:
+            subprocess.check_call(self.browser + [url])
         else:
             webbrowser.open(url)
 
@@ -61,6 +67,7 @@ def make_parser(doc=__doc__):
         formatter_class=CustomFormatter, description=__doc__
     )
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--browser")
 
     subparsers = parser.add_subparsers()
 
