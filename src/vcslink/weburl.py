@@ -114,6 +114,25 @@ class WebURL:
         revision: str = "master",
         permalink: Optional[bool] = None,
     ) -> str:
+        """
+        Get an URL to file.
+
+        ..
+           >>> _ = getfixture("github_repository")
+
+        >>> import vcslink
+        >>> weburl = vcslink.analyze()
+        >>> weburl.file("README.md")
+        'http://github.com/USER/PROJECT/blob/master/README.md'
+        >>> weburl.file("README.md", permalink=True)       # doctest: +SKIP
+        'http://github.com/USER/PROJECT/blob/55150afe539493d650889224db136bc8d9b7ecb8/README.md'
+        >>> weburl.file("README.md", lines="1")        # doctest: +ELLIPSIS
+        'http://github.com/USER/PROJECT/blob/.../README.md#L1'
+        >>> weburl.file("README.md", lines="1-2")      # doctest: +ELLIPSIS
+        'http://github.com/USER/PROJECT/blob/.../README.md#L1-L2'
+        >>> weburl.file("README.md", lines="1-2", permalink=False)
+        'http://github.com/USER/PROJECT/blob/master/README.md#L1-L2'
+        """
         if permalink is None:
             permalink = bool(lines)
         if permalink:

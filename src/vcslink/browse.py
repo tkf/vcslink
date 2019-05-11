@@ -18,7 +18,7 @@ class Application:
     @classmethod
     def run(cls, dry_run, browser, func, **kwargs):
         browser_cmd = shlex.split(browser) if browser else []
-        weburl = analyze(path=".")
+        weburl = analyze()
         return func(cls(dry_run=dry_run, browser=browser_cmd), weburl=weburl, **kwargs)
 
     def open_url(self, url):
