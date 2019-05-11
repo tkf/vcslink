@@ -40,6 +40,7 @@ def prepare_github_repository(tmp_path_factory):
     git("add", "README.md")
     git("commit", "--message", "Add README.md")
     git("config", "branch.master.remote", "origin")
+    git("config", "branch.master.merge", "refs/heads/master")
 
     return path
 

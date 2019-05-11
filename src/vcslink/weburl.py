@@ -96,7 +96,7 @@ class WebURL:
         >>> weburl.pull_request()
         'https://github.com/USER/PROJECT/pull/new/master'
         """
-        branch = self.local_branch.name
+        branch = self.local_branch.remote_branch()
         if self.is_github():
             # https://github.com/{user}/{repo}/pull/new/{branch}
             return self.rooturl + "/pull/new/" + branch
@@ -133,7 +133,7 @@ class WebURL:
         'https://github.com/USER/PROJECT/commits/dev'
         """
         if not branch:
-            branch = self.local_branch.name
+            branch = self.local_branch.remote_branch()
         if self.is_bitbucket():
             return f"{self.rooturl}/commits/branch/{branch}"
         else:
@@ -187,7 +187,7 @@ class WebURL:
         if permalink:
             revision = self.repo.resolve_revision(revision)
         else:
-            revision = "master"
+            revision = self.local_branch.remote_branch()
         relurl = "/".join(self.repo.relpath(file).parts)
         fragment = self._format_lines(lines)
         if self.is_bitbucket():

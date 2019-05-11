@@ -60,6 +60,11 @@ class GitRepoAnalyzer(BaseRepoAnalyzer):
     def remote_url(self, **kwargs):
         return self.choose_url(self.remote_all_urls(**kwargs))
 
+    def remote_branch(self, branch):
+        ref = self.git_config(f"branch.{branch}.merge")
+        assert ref.startswith("refs/heads/")
+        return ref[len("refs/heads/") :]
+
     def current_branch(self):
         return self.git("rev-parse", "--abbrev-ref", "HEAD").stdout.rstrip()
 
@@ -86,6 +91,9 @@ class LocalBranch:
 
     def remote_url(self) -> str:
         return self.repo.remote_url(branch=self.name)
+
+    def remote_branch(self) -> str:
+        return self.repo.remote_branch(branch=self.name)
 
     def need_pull_request(self) -> bool:
         return self.repo.need_pull_request(self.name)

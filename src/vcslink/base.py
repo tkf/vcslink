@@ -15,6 +15,10 @@ class BaseRepoAnalyzer(ABC):
         ...
 
     @abstractmethod
+    def remote_branch(self, branch: str) -> str:
+        ...
+
+    @abstractmethod
     def need_pull_request(self, branch: str) -> bool:
         ...
 

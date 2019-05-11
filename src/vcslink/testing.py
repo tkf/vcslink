@@ -11,6 +11,7 @@ class DummyRepoAnalyzer(BaseRepoAnalyzer):
         self.mock = Mock()
         self.mock.current_branch.return_value = "master"
         self.mock.remote_url.return_value = "git@github.com:USER/PROJECT.git"
+        self.mock.remote_branch.return_value = "master"
         self.mock.need_pull_request.return_value = False
 
     def current_branch(self):
@@ -18,6 +19,9 @@ class DummyRepoAnalyzer(BaseRepoAnalyzer):
 
     def remote_url(self, branch: str = "master") -> str:
         return self.mock.remote_url(branch)
+
+    def remote_branch(self, branch: str) -> str:
+        return self.mock.remote_branch(branch)
 
     def need_pull_request(self, branch: str) -> bool:
         return self.mock.need_pull_request(branch)
