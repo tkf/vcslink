@@ -1,13 +1,12 @@
 import subprocess
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional
 
+from .base import BaseRepoAnalyzer, Pathish
 from .weburl import WebURL
 
-Pathish = Union[str, Path]
 
-
-class GitRepoAnalyzer:
+class GitRepoAnalyzer(BaseRepoAnalyzer):
     cwd: Path
     root: Path
 
@@ -41,7 +40,7 @@ class GitRepoAnalyzer:
     def git_config(self, config):
         return self.git("config", "--get", config).stdout.rstrip()
 
-    def git_revision(self, revision):
+    def resolve_revision(self, revision):
         return self.git("rev-parse", "--verify", revision).stdout.strip()
 
     @staticmethod
@@ -72,12 +71,17 @@ class GitRepoAnalyzer:
     def local_branch(self, **kwargs):
         return LocalBranch(self, **kwargs)
 
+    def relpath(self, path: Pathish) -> Path:
+        relpath = Path(path).absolute().relative_to(self.root)
+        assert not str(relpath).startswith("..")
+        return relpath
+
 
 class LocalBranch:
-    repo: GitRepoAnalyzer
+    repo: BaseRepoAnalyzer
     name: str
 
-    def __init__(self, repo: GitRepoAnalyzer, name: Optional[str] = None):
+    def __init__(self, repo: BaseRepoAnalyzer, name: Optional[str] = None):
         self.repo = repo
         if name is None:
             name = repo.current_branch()

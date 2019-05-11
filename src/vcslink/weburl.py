@@ -2,7 +2,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Optional, Tuple, Union
 
 if TYPE_CHECKING:
-    from .git import LocalBranch, GitRepoAnalyzer
+    from .base import BaseRepoAnalyzer
+    from .git import LocalBranch
 
 Pathish = Union[str, Path]
 
@@ -67,7 +68,7 @@ def parselines(lines: Optional[str]) -> LinesSpecifier:
 
 class WebURL:
     local_branch: "LocalBranch"
-    repo: "GitRepoAnalyzer"
+    repo: "BaseRepoAnalyzer"
     rooturl: str
 
     def __init__(self, local_branch: "LocalBranch"):
@@ -92,7 +93,7 @@ class WebURL:
         raise NotImplementedError
 
     def commit(self, revision: str) -> str:
-        revision = self.repo.git_revision(revision)
+        revision = self.repo.resolve_revision(revision)
         if self.is_bitbucket():
             return f"{self.rooturl}/commits/{revision}"
         else:
@@ -135,31 +136,27 @@ class WebURL:
         Get an URL to file.
 
         ..
-           >>> _ = getfixture("github_repository")
+           >>> from vcslink.testing import dummy_weburl
+           >>> weburl = dummy_weburl()
 
-        >>> import vcslink
-        >>> weburl = vcslink.analyze()
         >>> weburl.file("README.md")
-        'http://github.com/USER/PROJECT/blob/master/README.md'
-        >>> weburl.file("README.md", permalink=True)       # doctest: +SKIP
-        'http://github.com/USER/PROJECT/blob/55150afe539493d650889224db136bc8d9b7ecb8/README.md'
-        >>> weburl.file("README.md", lines=1)          # doctest: +ELLIPSIS
-        'http://github.com/USER/PROJECT/blob/.../README.md#L1'
-        >>> weburl.file("README.md", lines=(1, 2))     # doctest: +ELLIPSIS
-        'http://github.com/USER/PROJECT/blob/.../README.md#L1-L2'
+        'https://github.com/USER/PROJECT/blob/master/README.md'
+        >>> weburl.file("README.md", permalink=True)
+        'https://github.com/USER/PROJECT/blob/55150afe539493d650889224db136bc8d9b7ecb8/README.md'
+        >>> weburl.file("README.md", lines=1)
+        'https://github.com/USER/PROJECT/blob/55150afe539493d650889224db136bc8d9b7ecb8/README.md#L1'
+        >>> weburl.file("README.md", lines=(1, 2))
+        'https://github.com/USER/PROJECT/blob/55150afe539493d650889224db136bc8d9b7ecb8/README.md#L1-L2'
         >>> weburl.file("README.md", lines=(1, 2), permalink=False)
-        'http://github.com/USER/PROJECT/blob/master/README.md#L1-L2'
+        'https://github.com/USER/PROJECT/blob/master/README.md#L1-L2'
         """
         if permalink is None:
             permalink = lines is not None
         if permalink:
-            revision = self.repo.git_revision(revision)
+            revision = self.repo.resolve_revision(revision)
         else:
             revision = "master"
-        path = Path(file)
-        relpath = path.absolute().relative_to(self.repo.root)
-        assert not str(relpath).startswith("..")
-        relurl = "/".join(relpath.parts)
+        relurl = "/".join(self.repo.relpath(file).parts)
         fragment = self._format_lines(lines)
         if self.is_bitbucket():
             return f"{self.rooturl}/src/{revision}/{relurl}{fragment}"
