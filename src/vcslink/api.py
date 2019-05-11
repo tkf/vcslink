@@ -1,6 +1,8 @@
-from .git import GitRepoAnalyzer, Pathish
+from .git import GitRepoAnalyzer, Pathish, choose_local_branch
 from .weburl import WebURL
 
 
 def analyze(path: Pathish = ".", **kwargs) -> WebURL:
-    return GitRepoAnalyzer.from_path(path).local_branch(**kwargs).weburl()
+    repo = GitRepoAnalyzer.from_path(path)
+    local_branch = choose_local_branch(repo, **kwargs)
+    return local_branch.weburl()

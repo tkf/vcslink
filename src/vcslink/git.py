@@ -68,9 +68,6 @@ class GitRepoAnalyzer(BaseRepoAnalyzer):
             branch == "master" and self.git_config(f"branch.master.remote") == "origin"
         )
 
-    def local_branch(self, **kwargs):
-        return LocalBranch(self, **kwargs)
-
     def relpath(self, path: Pathish) -> Path:
         relpath = Path(path).absolute().relative_to(self.root)
         assert not str(relpath).startswith("..")
@@ -95,3 +92,25 @@ class LocalBranch:
 
     def weburl(self) -> WebURL:
         return WebURL(self)
+
+
+def is_supported_url(url):
+    # TODO: improve!
+    for host in ["gitlab", "github", "bitbucket"]:
+        if host in url:
+            return True
+    return False
+
+
+def choose_local_branch(
+    repo: BaseRepoAnalyzer, branch: Optional[str] = None
+) -> LocalBranch:
+
+    if branch is not None:
+        return LocalBranch(repo, name=branch)
+
+    branch = repo.current_branch()
+    if is_supported_url(repo.remote_url(branch=branch)):
+        return LocalBranch(repo, name=branch)
+
+    return LocalBranch(repo, name="master")
