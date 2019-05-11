@@ -1,8 +1,13 @@
 sudo: false
 language: python
+dist: xenial  # required for Python >= 3.7
 
 python:
-  - "3.6"
+  - "3.7"
+
+env:
+  global:
+    - TOXENV=py
 
 before_install:
   - pip install --quiet "pip>=19.0"
@@ -16,6 +21,18 @@ after_success:
   # (see also [[./tox.ini::coverage:paths]]):
   - .tox/py*/bin/coverage combine .coverage
   - coveralls
+
+matrix:
+  include:
+    - &check
+      env:
+        - TOXENV=style
+      script:
+        - tox
+      after_success: skip
+    - <<: *check
+      env:
+        - TOXENV=type
 
 notifications:
   email: false
