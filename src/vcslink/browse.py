@@ -1,3 +1,7 @@
+"""
+Open relevant pages in GitHub/GitLab/Bitbucket.
+"""
+
 import argparse
 import shlex
 import subprocess
@@ -31,6 +35,9 @@ class Application:
 
 
 def cli_auto(app: Application, weburl: WebURL):
+    """
+    Open repository root or a PR submission page (if appropriate).
+    """
     if weburl.local_branch.need_pull_request():
         url = weburl.pull_request()
     else:
@@ -39,16 +46,25 @@ def cli_auto(app: Application, weburl: WebURL):
 
 
 def cli_commit(app: Application, weburl: WebURL, revision):
+    """
+    Open commit page for a <revision>.
+    """
     url = weburl.commit(revision)
     app.open_url(url)
 
 
 def cli_log(app: Application, weburl: WebURL, revision):
+    """
+    Open log page for a <revision>.
+    """
     url = weburl.log(revision)
     app.open_url(url)
 
 
 def cli_file(app: Application, weburl: WebURL, permalink, lines: str, **kwargs):
+    """
+    Open file page.
+    """
     _permalink = {"auto": None, "yes": True, "no": False}[permalink]
     _lines = parselines(lines)
     url = weburl.file(permalink=_permalink, lines=_lines, **kwargs)
@@ -90,9 +106,28 @@ def make_parser(doc=__doc__):
     p.add_argument("revision", nargs="?")
 
     p = subp("file", cli_file)
-    p.add_argument("--permalink", default="auto", choices=("auto", "yes", "no"))
-    p.add_argument("file")
-    p.add_argument("lines", nargs="?")
+    p.add_argument(
+        "--permalink",
+        default="auto",
+        choices=("auto", "yes", "no"),
+        help="""
+        Resolve <revision> if `yes`.  Use branch name if `no`.  If
+        `auto` (default), resolve <revision> if <lines> are specified.
+        """,
+    )
+    p.add_argument(
+        "file",
+        help="""
+        File path.
+        """,
+    )
+    p.add_argument(
+        "lines",
+        nargs="?",
+        help="""
+        A number or a pair of number separated by a hyphen `-`.
+        """,
+    )
     p.add_argument("revision", nargs="?", default="master")
 
     parser.set_defaults(func=cli_auto)
