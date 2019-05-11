@@ -31,8 +31,8 @@ class Application:
 
 
 def cli_auto(app: Application, weburl: WebURL):
-    if weburl.local_branch.need_pr():
-        url = weburl.pr()
+    if weburl.local_branch.need_pull_request():
+        url = weburl.pull_request()
     else:
         url = weburl.rooturl
     app.open_url(url)

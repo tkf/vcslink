@@ -71,7 +71,7 @@ class WebURL:
     def is_github(self):
         return "//github.com" in self.rooturl
 
-    def pr(self):
+    def pull_request(self):
         branch = self.local_branch.name
         if self.is_github():
             # https://github.com/{user}/{repo}/pull/new/{branch}

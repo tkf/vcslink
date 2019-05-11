@@ -64,7 +64,7 @@ class GitRepoAnalyzer:
     def current_branch(self):
         return self.git("rev-parse", "--abbrev-ref", "HEAD").stdout.rstrip()
 
-    def need_pr(self, branch):
+    def need_pull_request(self, branch):
         return not (
             branch == "master" and self.git_config(f"branch.master.remote") == "origin"
         )
@@ -86,8 +86,8 @@ class LocalBranch:
     def remote_url(self) -> str:
         return self.repo.remote_url(branch=self.name)
 
-    def need_pr(self) -> bool:
-        return self.repo.need_pr(self.name)
+    def need_pull_request(self) -> bool:
+        return self.repo.need_pull_request(self.name)
 
     def weburl(self) -> WebURL:
         return WebURL(self)
