@@ -86,6 +86,16 @@ class WebURL:
         return "//github.com" in self.rooturl
 
     def pull_request(self):
+        """
+        Get a URL to the web page for submitting a PR.
+
+        ..
+           >>> from vcslink.testing import dummy_weburl
+           >>> weburl = dummy_weburl()
+
+        >>> weburl.pull_request()
+        'https://github.com/USER/PROJECT/pull/new/master'
+        """
         branch = self.local_branch.name
         if self.is_github():
             # https://github.com/{user}/{repo}/pull/new/{branch}
@@ -93,6 +103,16 @@ class WebURL:
         raise NotImplementedError
 
     def commit(self, revision: str) -> str:
+        """
+        Get a URL to commit page.
+
+        ..
+           >>> from vcslink.testing import dummy_weburl
+           >>> weburl = dummy_weburl()
+
+        >>> weburl.commit("master")
+        'https://github.com/USER/PROJECT/commit/55150afe539493d650889224db136bc8d9b7ecb8'
+        """
         revision = self.repo.resolve_revision(revision)
         if self.is_bitbucket():
             return f"{self.rooturl}/commits/{revision}"
@@ -100,6 +120,18 @@ class WebURL:
             return f"{self.rooturl}/commit/{revision}"
 
     def log(self, branch: Optional[str] = None) -> str:
+        """
+        Get a URL to history page.
+
+        ..
+           >>> from vcslink.testing import dummy_weburl
+           >>> weburl = dummy_weburl()
+
+        >>> weburl.log()
+        'https://github.com/USER/PROJECT/commits/master'
+        >>> weburl.log("dev")
+        'https://github.com/USER/PROJECT/commits/dev'
+        """
         if not branch:
             branch = self.local_branch.name
         if self.is_bitbucket():
@@ -133,7 +165,7 @@ class WebURL:
         permalink: Optional[bool] = None,
     ) -> str:
         """
-        Get an URL to file.
+        Get a URL to file.
 
         ..
            >>> from vcslink.testing import dummy_weburl
