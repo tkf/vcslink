@@ -1,5 +1,10 @@
 from pathlib import Path
-from typing import Optional
+from typing import TYPE_CHECKING, Optional, Union
+
+if TYPE_CHECKING:
+    from .git import LocalBranch, GitRepoAnalyzer
+
+Pathish = Union[str, Path]
 
 
 def rooturl(url):
@@ -48,7 +53,11 @@ def _specialurl(url):
 
 
 class WebURL:
-    def __init__(self, local_branch):
+    local_branch: "LocalBranch"
+    repo: "GitRepoAnalyzer"
+    rooturl: str
+
+    def __init__(self, local_branch: "LocalBranch"):
         self.local_branch = local_branch
         self.repo = local_branch.repo
         self.rooturl = rooturl(local_branch.remote_url())
@@ -69,14 +78,14 @@ class WebURL:
             return self.rooturl + "/pull/new/" + branch
         raise NotImplementedError
 
-    def commit(self, revision):
+    def commit(self, revision: str):
         revision = self.repo.git_revision(revision)
         if self.is_bitbucket():
             return f"{self.rooturl}/commits/{revision}"
         else:
             return f"{self.rooturl}/commit/{revision}"
 
-    def log(self, branch=None):
+    def log(self, branch: Optional[str] = None):
         if not branch:
             branch = self.local_branch.name
         if self.is_bitbucket():
@@ -84,7 +93,7 @@ class WebURL:
         else:
             return f"{self.rooturl}/commits/{branch}"
 
-    def _format_lines(self, lines):
+    def _format_lines(self, lines: Optional[str]):
         if not lines:
             return ""
 
@@ -100,7 +109,7 @@ class WebURL:
 
     def file(
         self,
-        file,
+        file: Pathish,
         lines: Optional[str] = None,
         revision: str = "master",
         permalink: Optional[bool] = None,
