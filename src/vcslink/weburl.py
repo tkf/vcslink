@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Optional, Tuple, Union
 
 if TYPE_CHECKING:
     from .git import LocalBranch, GitRepoAnalyzer
@@ -52,6 +52,19 @@ def _specialurl(url):
     return url
 
 
+LinesSpecifier = Union[None, int, Tuple[int, int]]
+
+
+def parselines(lines: Optional[str]) -> LinesSpecifier:
+    if not lines:
+        return None
+    if "-" in lines:
+        beg, end = lines.split("-")
+        return (int(beg), int(end))
+    else:
+        return int(lines)
+
+
 class WebURL:
     local_branch: "LocalBranch"
     repo: "GitRepoAnalyzer"
@@ -93,24 +106,28 @@ class WebURL:
         else:
             return f"{self.rooturl}/commits/{branch}"
 
-    def _format_lines(self, lines: Optional[str]) -> str:
+    def _format_lines(self, lines: LinesSpecifier) -> str:
         if not lines:
             return ""
 
+        nums: Union[Tuple[int], Tuple[int, int]] = lines if isinstance(
+            lines, tuple
+        ) else (lines,)
+
         if self.is_bitbucket():
-            fragment = "lines-" + ":".join(lines.split("-"))
+            fragment = "lines-" + ":".join(map(str, nums))
         elif self.is_gitlab():
-            fragment = f"L{lines}"
+            fragment = "L" + "-".join(map(str, nums))
         else:
             # github.com
-            fragment = "-".join(f"L{x}" for x in lines.split("-"))
+            fragment = "-".join(f"L{x}" for x in nums)
 
         return f"#{fragment}"
 
     def file(
         self,
         file: Pathish,
-        lines: Optional[str] = None,
+        lines: LinesSpecifier = None,
         revision: str = "master",
         permalink: Optional[bool] = None,
     ) -> str:
@@ -126,15 +143,15 @@ class WebURL:
         'http://github.com/USER/PROJECT/blob/master/README.md'
         >>> weburl.file("README.md", permalink=True)       # doctest: +SKIP
         'http://github.com/USER/PROJECT/blob/55150afe539493d650889224db136bc8d9b7ecb8/README.md'
-        >>> weburl.file("README.md", lines="1")        # doctest: +ELLIPSIS
+        >>> weburl.file("README.md", lines=1)          # doctest: +ELLIPSIS
         'http://github.com/USER/PROJECT/blob/.../README.md#L1'
-        >>> weburl.file("README.md", lines="1-2")      # doctest: +ELLIPSIS
+        >>> weburl.file("README.md", lines=(1, 2))     # doctest: +ELLIPSIS
         'http://github.com/USER/PROJECT/blob/.../README.md#L1-L2'
-        >>> weburl.file("README.md", lines="1-2", permalink=False)
+        >>> weburl.file("README.md", lines=(1, 2), permalink=False)
         'http://github.com/USER/PROJECT/blob/master/README.md#L1-L2'
         """
         if permalink is None:
-            permalink = bool(lines)
+            permalink = lines is not None
         if permalink:
             revision = self.repo.git_revision(revision)
         else:

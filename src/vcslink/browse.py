@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from typing import List
 
 from .api import analyze
-from .weburl import WebURL
+from .weburl import WebURL, parselines
 
 
 @dataclass
@@ -48,9 +48,10 @@ def cli_log(app: Application, weburl: WebURL, revision):
     app.open_url(url)
 
 
-def cli_file(app: Application, weburl: WebURL, permalink, **kwargs):
+def cli_file(app: Application, weburl: WebURL, permalink, lines: str, **kwargs):
     _permalink = {"auto": None, "yes": True, "no": False}[permalink]
-    url = weburl.file(permalink=_permalink, **kwargs)
+    _lines = parselines(lines)
+    url = weburl.file(permalink=_permalink, lines=_lines, **kwargs)
     app.open_url(url)
 
 
