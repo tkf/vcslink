@@ -24,6 +24,11 @@ after_success:
 
 matrix:
   include:
+
+    # This is somehow required to run the "default" job:
+    - env:
+        - TOXENV=py
+
     - &check
       env:
         - TOXENV=style
