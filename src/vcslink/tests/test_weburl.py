@@ -5,6 +5,7 @@ import pytest  # type: ignore
 from ..api import analyze
 from ..git import LocalBranch
 from ..testing import DummyRepoAnalyzer
+from ..weburl import UnsupportedURLError, rooturl
 
 SHA_RE_STR = "(?:[a-z0-9]{40})"
 
@@ -45,3 +46,18 @@ def test_github_url_variants(git_url):
     repo.mock.remote_url.return_value = git_url
     weburl = LocalBranch(repo).weburl()
     assert weburl.rooturl == "https://github.com/USER/PROJECT"
+
+
+@pytest.mark.parametrize(
+    "git_url",
+    [
+        # List of links that would throw UnsupportedURLError:
+        "unsupported.host",
+        "unsupported.host:some/remote/path",
+        "git@host",
+    ],
+)
+def test_unsupported_rooturl(git_url):
+    with pytest.raises(UnsupportedURLError) as exc_info:
+        rooturl(git_url)
+    assert exc_info.value.url == git_url

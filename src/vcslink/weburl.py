@@ -9,6 +9,14 @@ if TYPE_CHECKING:
 Pathish = Union[str, Path]
 
 
+class UnsupportedURLError(ValueError):
+    def __init__(self, url):
+        self.url = url
+
+    def __str__(self):
+        return f"Unsupported URL: {self.url}"
+
+
 def rooturl(url):
     """
     Turn Git `url` to something web browsers recognize.
@@ -24,6 +32,11 @@ def rooturl(url):
 
     >>> rooturl("git@gitlab.com:group/project.wiki.git")
     'https://gitlab.com/group/project/wikis'
+
+    >>> rooturl("unsupported.host:some/remote/path")
+    Traceback (most recent call last):
+      ...
+    vcslink...UnsupportedURLError: Unsupported URL: unsupported.host:some/remote/path
     """
     return _specialurl(_rooturl(url))
 
@@ -33,14 +46,14 @@ def _rooturl(url):
     if match:
         return f"https://{match.group(1)}"
     if "@" not in url:
-        raise ValueError(f"Unsupported URL: {url}")
+        raise UnsupportedURLError(url)
     _, web = url.split("@", 1)
     if ":" in web:
         host, path = web.split(":", 1)
     elif "/" in web:
         host, path = web.split("/", 1)
     else:
-        raise ValueError(f"Unsupported URL: {url}")
+        raise UnsupportedURLError(url)
     if path.endswith(".git"):
         path = path[: -len(".git")]
     return f"https://{host}/{path}"
