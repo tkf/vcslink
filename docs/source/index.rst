@@ -1,23 +1,36 @@
 Welcome to vcslinks's documentation!
 ====================================
 
+.. currentmodule:: vcslinks
+
+
 High-level API
 ==============
 
-.. autofunction:: vcslinks.root
-.. autofunction:: vcslinks.pull_request
-.. autofunction:: vcslinks.commit
-.. autofunction:: vcslinks.log
-.. autofunction:: vcslinks.file
-.. autofunction:: vcslinks.diff
-.. autofunction:: vcslinks.blame
+.. autosummary::
+
+   root
+   pull_request
+   commit
+   log
+   file
+   diff
+   blame
+
+.. autofunction:: root
+.. autofunction:: pull_request
+.. autofunction:: commit
+.. autofunction:: log
+.. autofunction:: file
+.. autofunction:: diff
+.. autofunction:: blame
 
 Low-level API
 =============
 
-.. autofunction:: vcslinks.analyze
+.. autofunction:: analyze
 
-.. autoclass:: vcslinks.WebURL
+.. autoclass:: WebURL
    :members:
 
 
