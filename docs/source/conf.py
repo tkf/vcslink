@@ -86,7 +86,12 @@ html_theme = "alabaster"
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
+# https://alabaster.readthedocs.io/en/latest/customization.html
 html_theme_options = {
+    "github_banner": True,
+    "github_user": "tkf",
+    "github_repo": "vcslinks",
+    # "fixed_sidebar": True,
     "body_max_width": "100%",  # default: 800px?
     "page_width": "1100px",  # default: 940px
 }
