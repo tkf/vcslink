@@ -84,7 +84,10 @@ html_theme = "alabaster"
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    "body_max_width": "100%",  # default: 800px?
+    "page_width": "1100px",  # default: 940px
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -99,7 +102,10 @@ html_static_path = ["_static"]
 # default: ``['localtoc.html', 'relations.html', 'sourcelink.html',
 # 'searchbox.html']``.
 #
-# html_sidebars = {}
+html_sidebars = {
+    # Suppress sidebar:
+    "**": []
+}
 
 
 # -- Options for HTMLHelp output ---------------------------------------------
