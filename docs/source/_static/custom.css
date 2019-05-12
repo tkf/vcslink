@@ -1,0 +1,12 @@
+table.docutils {
+    border: 0px;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+table.docutils td, table.docutils th {
+    border: 0px;
+}
