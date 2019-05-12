@@ -14,12 +14,9 @@ before_install:
   - pip install --quiet tox coveralls
 
 script:
-  - tox -- --cov=vcslink
+  - tox
 
 after_success:
-  # Strip off ".tox/..." from the coverage
-  # (see also [[./tox.ini::coverage:paths]]):
-  - .tox/py*/bin/coverage combine .coverage
   - coveralls
 
 matrix:
