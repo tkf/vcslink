@@ -1,3 +1,6 @@
+import shlex
+import sys
+
 from ..browse import main
 
 
@@ -12,3 +15,9 @@ def test_smoke(github_repository):
     dry_run("file", "README.md")
     dry_run("diff")
     dry_run("blame", "README.md")
+
+
+def test_smoke_browser(github_repository):
+    # No-op command:
+    browser = " ".join(map(shlex.quote, [sys.executable, "-c", ""]))
+    main(["--browser", browser])
