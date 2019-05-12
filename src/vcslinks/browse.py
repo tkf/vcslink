@@ -127,33 +127,43 @@ def make_parser(doc=__doc__):
         )
         p.add_argument(
             "file",
+            metavar="<file>",
             help="""
             File path.
             """,
         )
         p.add_argument(
             "lines",
+            metavar="<lines>",
             nargs="?",
             help="""
-            A number or a pair of number separated by a hyphen `-`.
+            A number or a pair of number separated by a hyphen ``-``;
+            e.g., ``1`` or ``1-2``.
             """,
         )
-        p.add_argument("revision", nargs="?", default="master")
+        p.add_argument(
+            "revision",
+            metavar="<revision>",
+            nargs="?",
+            help="""
+            Git commit-ish.
+            """,
+        )
 
     p = subp("auto", cli_auto)
 
     p = subp("commit", cli_commit)
-    p.add_argument("revision", nargs="?", default="HEAD")
+    p.add_argument("revision", metavar="<revision>", nargs="?", default="HEAD")
 
     p = subp("log", cli_log)
-    p.add_argument("revision", nargs="?")
+    p.add_argument("revision", metavar="<revision>", nargs="?")
 
     p = subp("file", cli_file)
     add_file_arguments(p)
 
     p = subp("diff", cli_diff)
-    p.add_argument("revision1", nargs="?")
-    p.add_argument("revision2", nargs="?")
+    p.add_argument("revision1", metavar="<revision1>", nargs="?")
+    p.add_argument("revision2", metavar="<revision2>", nargs="?")
 
     p = subp("blame", cli_blame)
     add_file_arguments(p)
