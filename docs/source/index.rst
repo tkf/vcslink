@@ -8,6 +8,7 @@ High-level API
 ==============
 
 .. autosummary::
+   :nosignatures:
 
    root
    pull_request
