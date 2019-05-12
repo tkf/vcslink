@@ -3,14 +3,25 @@ from typing import Optional
 from .git import GitRepoAnalyzer, Pathish, choose_local_branch
 from .weburl import LinesSpecifier, WebURL
 
+PATH_DOC = """\
+        Path to a Git repository.  It can be a path to any file or
+        directory inside the repository.  The root of the Git
+        repository is found automatically by the ``git`` command.
+"""
+
+DEFAULT_DOCS = """
+    branch
+        Local branch name to be used.  The remote service is
+        determined from this local branch.  If not specified, current
+        local branch is used *if* its upstream is in one of the
+        supported remote service (e.g., GitHub).  Otherwise fallbacks
+        to ``master``.
+""".strip()
+
 
 def analyze(path: Pathish = ".", **kwargs) -> WebURL:
     """
     Analyze a Git repository and return a `WebURL` instance.
-
-    Argument `path` can point to any file or directory inside the Git
-    repository to be analyzed.  The root of the Git repository is
-    found automatically by the ``git`` command.
 
     ..
        >>> from vcslinks.testing import dummy_github_weburl
@@ -27,6 +38,12 @@ def analyze(path: Pathish = ".", **kwargs) -> WebURL:
     'https://github.com/USER/PROJECT/commits/master'
     >>> weburl.pull_request()
     'https://github.com/USER/PROJECT/pull/new/master'
+
+    Parameters
+    ----------
+    path
+        {PATH_DOC}
+    {DEFAULT_DOCS}
     """
     repo = GitRepoAnalyzer.from_path(path)
     local_branch = choose_local_branch(repo, **kwargs)
@@ -55,6 +72,12 @@ def root(*, path: Pathish = ".", **kwargs) -> str:
 
     >>> vcslinks.root(path="path/to/bitbucket/clone")
     'https://bitbucket.org/USER/PROJECT'
+
+    Parameters
+    ----------
+    path
+        {PATH_DOC}
+    {DEFAULT_DOCS}
     """
     return analyze(path, **kwargs).rooturl
 
@@ -81,6 +104,12 @@ def pull_request(path: Pathish = ".", **kwargs) -> str:
 
     >>> vcslinks.pull_request(path="path/to/bitbucket/clone")
     'https://bitbucket.org/USER/PROJECT/pull-requests/new?source=master'
+
+    Parameters
+    ----------
+    path
+        {PATH_DOC}
+    {DEFAULT_DOCS}
     """
     return analyze(path, **kwargs).pull_request()
 
@@ -109,11 +138,19 @@ def commit(revision: str = "HEAD", *, path: Pathish = ".", **kwargs) -> str:
 
     >>> vcslinks.commit(path="path/to/bitbucket/clone")
     'https://bitbucket.org/USER/PROJECT/commits/55150afe539493d650889224db136bc8d9b7ecb8'
+
+    Parameters
+    ----------
+    revision
+        Git commit-ish.  It is resolved in the *local* repository.
+    path
+        {PATH_DOC}
+    {DEFAULT_DOCS}
     """
     return analyze(path, **kwargs).commit(revision)
 
 
-def log(branch: Optional[str] = None, *, path: Pathish = ".", **kwargs) -> str:
+def log(commit: Optional[str] = None, *, path: Pathish = ".", **kwargs) -> str:
     """
     Get a URL to history page.
 
@@ -137,8 +174,17 @@ def log(branch: Optional[str] = None, *, path: Pathish = ".", **kwargs) -> str:
 
     >>> vcslinks.log(path="path/to/bitbucket/clone/")
     'https://bitbucket.org/USER/PROJECT/commits/branch/master'
+
+    Parameters
+    ----------
+    commit
+        Git commit-ish.  Note that it must be a remote branch name for
+        Bitbucket.
+    path
+        {PATH_DOC}
+    {DEFAULT_DOCS}
     """
-    return analyze(path, **kwargs).log(branch)
+    return analyze(path, **kwargs).log(commit)
 
 
 def file(
@@ -188,6 +234,21 @@ def file(
     >>> vcslinks.file("path/to/bitbucket/clone/README.md", lines=(1, 2))
     'https://bitbucket.org/USER/PROJECT/src/55150afe539493d650889224db136bc8d9b7ecb8/README.md#lines-1:2'
 
+    Parameters
+    ----------
+    file
+        Path to a file to be shown.
+    lines
+        Line(s) to be highlighted.  A tuple of two integers specifies
+        a range of lines.  An integer specifies a line.  No lines are
+        highlighted if a `None` is passed.
+    revision
+        Git commit-ish.
+    permalink:
+        Resolve the `revision` in the *local* repository to a full
+        revision if `True`.  Use `revision` (e.g., ``master``) as-is
+        if `False`.  If `None` (default), resolve `revision` if
+        non-`None` value is specified for `lines`.
     """
     return analyze(file, **kwargs).file(
         file, lines=lines, revision=revision, permalink=permalink
@@ -231,6 +292,24 @@ def diff(
 
     >>> vcslinks.diff("dev", path="path/to/bitbucket/clone/")
     'https://bitbucket.org/USER/PROJECT/branches/compare/dev%0Dmaster#diff'
+
+    Parameters
+    ----------
+    revision1
+    revision2
+        Function `diff` takes zero, one, or two commits as positional
+        arguments.  If two commits are given, the first commit is the
+        source and the second commit is the target.  If one commit is
+        given, it is the *target* and remote master is the source.  If
+        no revisions are given, the remote branch upstream to the
+        current local branch is compared to the remote master.
+    permalink
+        Resolve the revisions in the *local* repository to a full
+        revision if `True`.  Use `revision` (e.g., ``master``) as-is
+        if `False`.
+    path
+        {PATH_DOC}
+    {DEFAULT_DOCS}
     """
     return analyze(path, **kwargs).diff(
         revision1=revision1, revision2=revision2, permalink=permalink
@@ -246,6 +325,8 @@ def blame(
 ) -> str:
     """
     Get a URL to blame/annotate page.
+
+    See `vcslinks.file` for how the arguments are used.
 
     ..
        >>> getfixture("patch_analyze")
@@ -269,3 +350,10 @@ def blame(
     return analyze(file, **kwargs).blame(
         file, lines=lines, revision=revision, permalink=permalink
     )
+
+
+for f in [analyze, root, pull_request, commit, log, diff]:
+    f.__doc__ = f.__doc__.format(  # type: ignore
+        PATH_DOC=PATH_DOC, DEFAULT_DOCS=DEFAULT_DOCS
+    )
+del f
