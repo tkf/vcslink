@@ -79,6 +79,16 @@ def cli_diff(app: Application, weburl: WebURL, revision1, revision2):
     app.open_url(url)
 
 
+def cli_blame(app: Application, weburl: WebURL, permalink, lines: str, **kwargs):
+    """
+    Open blame/annotate page.
+    """
+    _permalink = {"auto": None, "yes": True, "no": False}[permalink]
+    _lines = parselines(lines)
+    url = weburl.blame(permalink=_permalink, lines=_lines, **kwargs)
+    app.open_url(url)
+
+
 class CustomFormatter(
     argparse.RawDescriptionHelpFormatter, argparse.ArgumentDefaultsHelpFormatter
 ):
@@ -105,6 +115,31 @@ def make_parser(doc=__doc__):
         p.set_defaults(func=func)
         return p
 
+    def add_file_arguments(p):
+        p.add_argument(
+            "--permalink",
+            default="auto",
+            choices=("auto", "yes", "no"),
+            help="""
+            Resolve <revision> if `yes`.  Use branch name if `no`.  If
+            `auto` (default), resolve <revision> if <lines> are specified.
+            """,
+        )
+        p.add_argument(
+            "file",
+            help="""
+            File path.
+            """,
+        )
+        p.add_argument(
+            "lines",
+            nargs="?",
+            help="""
+            A number or a pair of number separated by a hyphen `-`.
+            """,
+        )
+        p.add_argument("revision", nargs="?", default="master")
+
     p = subp("auto", cli_auto)
 
     p = subp("commit", cli_commit)
@@ -114,33 +149,14 @@ def make_parser(doc=__doc__):
     p.add_argument("revision", nargs="?")
 
     p = subp("file", cli_file)
-    p.add_argument(
-        "--permalink",
-        default="auto",
-        choices=("auto", "yes", "no"),
-        help="""
-        Resolve <revision> if `yes`.  Use branch name if `no`.  If
-        `auto` (default), resolve <revision> if <lines> are specified.
-        """,
-    )
-    p.add_argument(
-        "file",
-        help="""
-        File path.
-        """,
-    )
-    p.add_argument(
-        "lines",
-        nargs="?",
-        help="""
-        A number or a pair of number separated by a hyphen `-`.
-        """,
-    )
-    p.add_argument("revision", nargs="?", default="master")
+    add_file_arguments(p)
 
     p = subp("diff", cli_diff)
     p.add_argument("revision1", nargs="?")
     p.add_argument("revision2", nargs="?")
+
+    p = subp("blame", cli_blame)
+    add_file_arguments(p)
 
     parser.set_defaults(func=cli_auto)
     return parser

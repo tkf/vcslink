@@ -171,7 +171,9 @@ class WebURL:
         else:
             return f"{self.rooturl}/commits/{branch}"
 
-    def _format_lines(self, lines: LinesSpecifier) -> str:
+    def _format_lines(
+        self, lines: LinesSpecifier, bitbucket_prefix: str = "lines"
+    ) -> str:
         if not lines:
             return ""
 
@@ -180,7 +182,7 @@ class WebURL:
         ) else (lines,)
 
         if self.is_bitbucket():
-            fragment = "lines-" + ":".join(map(str, nums))
+            fragment = bitbucket_prefix + "-" + ":".join(map(str, nums))
         elif self.is_gitlab():
             fragment = "L" + "-".join(map(str, nums))
         else:
@@ -188,6 +190,16 @@ class WebURL:
             fragment = "-".join(f"L{x}" for x in nums)
 
         return f"#{fragment}"
+
+    def _file_revision(
+        self, lines: LinesSpecifier, revision: str, permalink: Optional[bool]
+    ) -> str:
+        if permalink is None:
+            permalink = lines is not None
+        if permalink:
+            return self.repo.resolve_revision(revision)
+        else:
+            return self.local_branch.remote_branch()
 
     def file(
         self,
@@ -214,12 +226,7 @@ class WebURL:
         >>> weburl.file("README.md", lines=(1, 2), permalink=False)
         'https://github.com/USER/PROJECT/blob/master/README.md#L1-L2'
         """
-        if permalink is None:
-            permalink = lines is not None
-        if permalink:
-            revision = self.repo.resolve_revision(revision)
-        else:
-            revision = self.local_branch.remote_branch()
+        revision = self._file_revision(lines, revision, permalink)
         relurl = "/".join(self.repo.relpath(file).parts)
         fragment = self._format_lines(lines)
         if self.is_bitbucket():
@@ -258,3 +265,28 @@ class WebURL:
             return f"{rooturl}/branches/compare/{revision1}%0D{revision2}#diff"
         else:
             return f"{rooturl}/compare/{revision1}...{revision2}"
+
+    def blame(
+        self,
+        file: Pathish,
+        lines: LinesSpecifier = None,
+        revision: str = "master",
+        permalink: Optional[bool] = None,
+    ) -> str:
+        """
+        Get a URL to blame/annotate page.
+
+        ..
+           >>> from vcslinks.testing import dummy_weburl
+           >>> weburl = dummy_weburl()
+
+        >>> weburl.blame("README.md")
+        'https://github.com/USER/PROJECT/blame/master/README.md'
+        """
+        revision = self._file_revision(lines, revision, permalink)
+        relurl = "/".join(self.repo.relpath(file).parts)
+        fragment = self._format_lines(lines, bitbucket_prefix=relurl)
+        if self.is_bitbucket():
+            return f"{self.rooturl}/annotate/{relurl}?at={revision}{fragment}"
+        else:
+            return f"{self.rooturl}/blame/{revision}/{relurl}{fragment}"
