@@ -1,6 +1,8 @@
 Welcome to vcslinks's documentation!
 ====================================
 
+.. automodule:: vcslinks
+
 .. currentmodule:: vcslinks
 
 .. autosummary::
