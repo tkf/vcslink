@@ -190,7 +190,7 @@ def log(commit: Optional[str] = None, *, path: Pathish = ".", **kwargs) -> str:
 def file(
     file: Pathish,
     lines: LinesSpecifier = None,
-    revision: str = "master",
+    revision: Optional[str] = None,
     permalink: Optional[bool] = None,
     **kwargs,
 ) -> str:
@@ -319,7 +319,7 @@ def diff(
 def blame(
     file: Pathish,
     lines: LinesSpecifier = None,
-    revision: str = "master",
+    revision: Optional[str] = None,
     permalink: Optional[bool] = None,
     **kwargs,
 ) -> str:

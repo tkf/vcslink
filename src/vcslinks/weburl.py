@@ -205,20 +205,21 @@ class WebURL:
         return f"#{fragment}"
 
     def _file_revision(
-        self, lines: LinesSpecifier, revision: str, permalink: Optional[bool]
+        self, lines: LinesSpecifier, revision: Optional[str], permalink: Optional[bool]
     ) -> str:
         if permalink is None:
             permalink = lines is not None
+        if not revision:
+            revision = self.local_branch.remote_branch()
         if permalink:
             return self.repo.resolve_revision(revision)
-        else:
-            return self.local_branch.remote_branch()
+        return revision
 
     def file(
         self,
         file: Pathish,
         lines: LinesSpecifier = None,
-        revision: str = "master",
+        revision: Optional[str] = None,
         permalink: Optional[bool] = None,
     ) -> str:
         """
@@ -333,7 +334,7 @@ class WebURL:
         self,
         file: Pathish,
         lines: LinesSpecifier = None,
-        revision: str = "master",
+        revision: Optional[str] = None,
         permalink: Optional[bool] = None,
     ) -> str:
         """
