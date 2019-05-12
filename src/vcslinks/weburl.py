@@ -262,7 +262,7 @@ class WebURL:
             revision1 = "master"
         rooturl = self.rooturl
         if self.is_bitbucket():
-            return f"{rooturl}/branches/compare/{revision1}%0D{revision2}#diff"
+            return f"{rooturl}/branches/compare/{revision2}%0D{revision1}#diff"
         else:
             return f"{rooturl}/compare/{revision1}...{revision2}"
 
@@ -287,6 +287,6 @@ class WebURL:
         relurl = "/".join(self.repo.relpath(file).parts)
         fragment = self._format_lines(lines, bitbucket_prefix=relurl)
         if self.is_bitbucket():
-            return f"{self.rooturl}/annotate/{relurl}?at={revision}{fragment}"
+            return f"{self.rooturl}/annotate/{revision}/{relurl}{fragment}"
         else:
             return f"{self.rooturl}/blame/{revision}/{relurl}{fragment}"
