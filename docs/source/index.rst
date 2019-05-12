@@ -1,10 +1,6 @@
 Welcome to vcslinks's documentation!
 ====================================
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
 API
 ===
 
@@ -16,6 +12,12 @@ API
 
 Indices and tables
 ==================
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   vcsbrowse
 
 * :ref:`genindex`
 * :ref:`modindex`
