@@ -32,6 +32,7 @@ class DummyRepoAnalyzer(BaseRepoAnalyzer):
         return {
             "master": "55150afe539493d650889224db136bc8d9b7ecb8",
             "HEAD": "55150afe539493d650889224db136bc8d9b7ecb8",
+            "dev": "40539486fdaf08a39b57519eb06e0e200c932cfd",
         }[revision]
 
     def relpath(self, path):
@@ -42,5 +43,17 @@ class DummyRepoAnalyzer(BaseRepoAnalyzer):
         return p
 
 
-def dummy_weburl() -> WebURL:
+def dummy_github_weburl() -> WebURL:
     return LocalBranch(DummyRepoAnalyzer()).weburl()
+
+
+def dummy_gitlab_weburl() -> WebURL:
+    repo = DummyRepoAnalyzer()
+    repo.mock.remote_url.return_value = "git@gitlab.com:USER/PROJECT.git"
+    return LocalBranch(repo).weburl()
+
+
+def dummy_bitbucket_weburl() -> WebURL:
+    repo = DummyRepoAnalyzer()
+    repo.mock.remote_url.return_value = "git@bitbucket.org:USER/PROJECT.git"
+    return LocalBranch(repo).weburl()

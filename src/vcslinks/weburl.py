@@ -113,11 +113,17 @@ class WebURL:
         Get a URL to the web page for submitting a PR.
 
         ..
-           >>> from vcslinks.testing import dummy_weburl
-           >>> weburl = dummy_weburl()
+           >>> from vcslinks import testing
+           >>> weburl_github = testing.dummy_github_weburl()
+           >>> weburl_gitlab = testing.dummy_gitlab_weburl()
+           >>> weburl_bitbucket = testing.dummy_bitbucket_weburl()
 
-        >>> weburl.pull_request()
+        >>> weburl_github.pull_request()
         'https://github.com/USER/PROJECT/pull/new/master'
+        >>> weburl_gitlab.pull_request()
+        'https://gitlab.com/USER/PROJECT/merge_requests/new?merge_request%5Bsource_branch%5D=master'
+        >>> weburl_bitbucket.pull_request()
+        'https://bitbucket.org/USER/PROJECT/pull-requests/new?source=master'
         """
         branch = self.local_branch.remote_branch()
         if self.is_github():
@@ -139,8 +145,8 @@ class WebURL:
         Get a URL to commit page.
 
         ..
-           >>> from vcslinks.testing import dummy_weburl
-           >>> weburl = dummy_weburl()
+           >>> from vcslinks.testing import dummy_github_weburl
+           >>> weburl = dummy_github_weburl()
 
         >>> weburl.commit("master")
         'https://github.com/USER/PROJECT/commit/55150afe539493d650889224db136bc8d9b7ecb8'
@@ -156,12 +162,19 @@ class WebURL:
         Get a URL to history page.
 
         ..
-           >>> from vcslinks.testing import dummy_weburl
-           >>> weburl = dummy_weburl()
+           >>> from vcslinks import testing
+           >>> weburl_github = testing.dummy_github_weburl()
+           >>> weburl_gitlab = testing.dummy_gitlab_weburl()
+           >>> weburl_bitbucket = testing.dummy_bitbucket_weburl()
 
-        >>> weburl.log()
+        >>> weburl_github.log()
         'https://github.com/USER/PROJECT/commits/master'
-        >>> weburl.log("dev")
+        >>> weburl_gitlab.log()
+        'https://gitlab.com/USER/PROJECT/commits/master'
+        >>> weburl_bitbucket.log()
+        'https://bitbucket.org/USER/PROJECT/commits/branch/master'
+
+        >>> weburl_github.log("dev")
         'https://github.com/USER/PROJECT/commits/dev'
         """
         if not branch:
@@ -211,9 +224,11 @@ class WebURL:
         """
         Get a URL to file.
 
+        **GitHub**
+
         ..
-           >>> from vcslinks.testing import dummy_weburl
-           >>> weburl = dummy_weburl()
+           >>> from vcslinks import testing
+           >>> weburl = testing.dummy_github_weburl()
 
         >>> weburl.file("README.md")
         'https://github.com/USER/PROJECT/blob/master/README.md'
@@ -225,6 +240,28 @@ class WebURL:
         'https://github.com/USER/PROJECT/blob/55150afe539493d650889224db136bc8d9b7ecb8/README.md#L1-L2'
         >>> weburl.file("README.md", lines=(1, 2), permalink=False)
         'https://github.com/USER/PROJECT/blob/master/README.md#L1-L2'
+
+        **GitLab**
+
+        ..
+           >>> weburl = testing.dummy_gitlab_weburl()
+
+        >>> weburl.file("README.md", lines=1)
+        'https://gitlab.com/USER/PROJECT/blob/55150afe539493d650889224db136bc8d9b7ecb8/README.md#L1'
+        >>> weburl.file("README.md", lines=(1, 2))
+        'https://gitlab.com/USER/PROJECT/blob/55150afe539493d650889224db136bc8d9b7ecb8/README.md#L1-2'
+
+        **Bitbucket**
+
+        ..
+           >>> weburl = testing.dummy_bitbucket_weburl()
+
+        >>> weburl.file("README.md")
+        'https://bitbucket.org/USER/PROJECT/src/master/README.md'
+        >>> weburl.file("README.md", lines=1)
+        'https://bitbucket.org/USER/PROJECT/src/55150afe539493d650889224db136bc8d9b7ecb8/README.md#lines-1'
+        >>> weburl.file("README.md", lines=(1, 2))
+        'https://bitbucket.org/USER/PROJECT/src/55150afe539493d650889224db136bc8d9b7ecb8/README.md#lines-1:2'
         """
         revision = self._file_revision(lines, revision, permalink)
         relurl = "/".join(self.repo.relpath(file).parts)
@@ -244,12 +281,39 @@ class WebURL:
         """
         Get a URL to diff page.
 
+        **GitHub**
+
         ..
-           >>> from vcslinks.testing import dummy_weburl
-           >>> weburl = dummy_weburl()
+           >>> from vcslinks import testing
+           >>> weburl = testing.dummy_github_weburl()
 
         >>> weburl.diff("dev")
         'https://github.com/USER/PROJECT/compare/master...dev'
+        >>> weburl.diff(permalink=True)
+        'https://github.com/USER/PROJECT/compare/master...55150afe539493d650889224db136bc8d9b7ecb8'
+        >>> weburl.diff("master", "dev", permalink=True) == (
+        ...     'https://github.com/USER/PROJECT/compare/'
+        ...     '55150afe539493d650889224db136bc8d9b7ecb8'
+        ...     '...'
+        ...     '40539486fdaf08a39b57519eb06e0e200c932cfd'
+        ... )
+        True
+
+        **GitLab**
+
+        ..
+           >>> weburl = testing.dummy_gitlab_weburl()
+
+        >>> weburl.diff("dev")
+        'https://gitlab.com/USER/PROJECT/compare/master...dev'
+
+        **Bitbucket**
+
+        ..
+           >>> weburl = testing.dummy_bitbucket_weburl()
+
+        >>> weburl.diff("dev")
+        'https://bitbucket.org/USER/PROJECT/branches/compare/dev%0Dmaster#diff'
         """
         if not revision1:
             revision1 = self.local_branch.remote_branch()
@@ -276,12 +340,30 @@ class WebURL:
         """
         Get a URL to blame/annotate page.
 
+        **GitHub**
+
         ..
-           >>> from vcslinks.testing import dummy_weburl
-           >>> weburl = dummy_weburl()
+           >>> from vcslinks import testing
+           >>> weburl = testing.dummy_github_weburl()
 
         >>> weburl.blame("README.md")
         'https://github.com/USER/PROJECT/blame/master/README.md'
+
+        **GitLab**
+
+        ..
+           >>> weburl = testing.dummy_gitlab_weburl()
+
+        >>> weburl.blame("README.md")
+        'https://gitlab.com/USER/PROJECT/blame/master/README.md'
+
+        **Bitbucket**
+
+        ..
+           >>> weburl = testing.dummy_bitbucket_weburl()
+
+        >>> weburl.blame("README.md")
+        'https://bitbucket.org/USER/PROJECT/annotate/master/README.md'
         """
         revision = self._file_revision(lines, revision, permalink)
         relurl = "/".join(self.repo.relpath(file).parts)

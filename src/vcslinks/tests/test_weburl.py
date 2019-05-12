@@ -4,7 +4,7 @@ import pytest  # type: ignore
 
 from ..api import analyze
 from ..git import LocalBranch
-from ..testing import DummyRepoAnalyzer
+from ..testing import DummyRepoAnalyzer, dummy_bitbucket_weburl, dummy_gitlab_weburl
 from ..weburl import UnsupportedURLError, rooturl
 
 SHA_RE_STR = "(?:[a-z0-9]{40})"
@@ -49,9 +49,7 @@ def test_github_url_variants(git_url):
 
 
 def test_gitlab_file():
-    repo = DummyRepoAnalyzer()
-    repo.mock.remote_url.return_value = "git@gitlab.com:USER/PROJECT.git"
-    weburl = LocalBranch(repo).weburl()
+    weburl = dummy_gitlab_weburl()
     rooturl = "https://gitlab.com/USER/PROJECT"
     assert weburl.rooturl == rooturl
 
@@ -72,9 +70,7 @@ def test_gitlab_file():
 
 
 def test_bitbucket_file():
-    repo = DummyRepoAnalyzer()
-    repo.mock.remote_url.return_value = "git@bitbucket.org:USER/PROJECT.git"
-    weburl = LocalBranch(repo).weburl()
+    weburl = dummy_bitbucket_weburl()
     rooturl = "https://bitbucket.org/USER/PROJECT"
     assert weburl.rooturl == rooturl
 

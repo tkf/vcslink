@@ -11,8 +11,8 @@ def analyze(path: Pathish = ".", **kwargs) -> WebURL:
     found automatically by the ``git`` command.
 
     ..
-       >>> from vcslinks.testing import dummy_weburl
-       >>> weburl = dummy_weburl()
+       >>> from vcslinks.testing import dummy_github_weburl
+       >>> weburl = dummy_github_weburl()
 
     >>> weburl = analyze()                                 # doctest: +SKIP
     >>> weburl.rooturl
