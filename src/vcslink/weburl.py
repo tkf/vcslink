@@ -70,6 +70,16 @@ LinesSpecifier = Union[None, int, Tuple[int, int]]
 
 
 def parselines(lines: Optional[str]) -> LinesSpecifier:
+    """
+    Parse `lines` argument from the CLI.
+
+    >>> parselines(None) is None
+    True
+    >>> parselines("1")
+    1
+    >>> parselines("1-2")
+    (1, 2)
+    """
     if not lines:
         return None
     if "-" in lines:
