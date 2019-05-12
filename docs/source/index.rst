@@ -1,8 +1,19 @@
 Welcome to vcslinks's documentation!
 ====================================
 
-API
-===
+High-level API
+==============
+
+.. autofunction:: vcslinks.root
+.. autofunction:: vcslinks.pull_request
+.. autofunction:: vcslinks.commit
+.. autofunction:: vcslinks.log
+.. autofunction:: vcslinks.file
+.. autofunction:: vcslinks.diff
+.. autofunction:: vcslinks.blame
+
+Low-level API
+=============
 
 .. autofunction:: vcslinks.analyze
 

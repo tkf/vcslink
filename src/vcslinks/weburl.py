@@ -275,7 +275,6 @@ class WebURL:
         self,
         revision1: Optional[str] = None,
         revision2: Optional[str] = None,
-        file: Optional[str] = None,
         permalink: bool = False,
     ) -> str:
         """

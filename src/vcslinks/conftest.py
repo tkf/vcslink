@@ -4,6 +4,8 @@ from subprocess import run
 
 import pytest  # type: ignore
 
+from .testing import dummy_bitbucket_repo, dummy_github_repo, dummy_gitlab_repo
+
 
 @contextmanager
 def chdir(path):
@@ -49,3 +51,26 @@ def prepare_github_repository(tmp_path_factory):
 def github_repository(prepare_github_repository):
     with chdir(prepare_github_repository) as path:
         yield path
+
+
+@pytest.fixture
+def patch_analyze():
+    from . import api
+
+    GitRepoAnalyzer = api.GitRepoAnalyzer
+
+    class FakeGitRepoAnalyzer:
+        @classmethod
+        def from_path(cls, path):
+            if "/gitlab/" in path:
+                return dummy_gitlab_repo()
+            elif "/bitbucket/" in path:
+                return dummy_bitbucket_repo()
+            else:
+                return dummy_github_repo()
+
+    try:
+        api.GitRepoAnalyzer = FakeGitRepoAnalyzer
+        yield
+    finally:
+        api.GitRepoAnalyzer = GitRepoAnalyzer
