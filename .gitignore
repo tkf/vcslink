@@ -8,5 +8,5 @@
 /MANIFEST
 /build
 /dist
-/doc/build
+/docs/build
 /src/*.egg-info
