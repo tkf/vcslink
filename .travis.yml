@@ -35,6 +35,9 @@ matrix:
     - <<: *check
       env:
         - TOXENV=type
+    - <<: *check
+      env:
+        - TOXENV=docs
 
 notifications:
   email: false
