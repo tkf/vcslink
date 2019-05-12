@@ -71,6 +71,14 @@ def cli_file(app: Application, weburl: WebURL, permalink, lines: str, **kwargs):
     app.open_url(url)
 
 
+def cli_diff(app: Application, weburl: WebURL, revision1, revision2):
+    """
+    Open diff page.
+    """
+    url = weburl.diff(revision1, revision2)
+    app.open_url(url)
+
+
 class CustomFormatter(
     argparse.RawDescriptionHelpFormatter, argparse.ArgumentDefaultsHelpFormatter
 ):
@@ -129,6 +137,10 @@ def make_parser(doc=__doc__):
         """,
     )
     p.add_argument("revision", nargs="?", default="master")
+
+    p = subp("diff", cli_diff)
+    p.add_argument("revision1", nargs="?")
+    p.add_argument("revision2", nargs="?")
 
     parser.set_defaults(func=cli_auto)
     return parser

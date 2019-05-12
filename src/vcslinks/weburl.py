@@ -226,3 +226,35 @@ class WebURL:
             return f"{self.rooturl}/src/{revision}/{relurl}{fragment}"
         else:
             return f"{self.rooturl}/blob/{revision}/{relurl}{fragment}"
+
+    def diff(
+        self,
+        revision1: Optional[str] = None,
+        revision2: Optional[str] = None,
+        file: Optional[str] = None,
+        permalink: bool = False,
+    ) -> str:
+        """
+        Get a URL to diff page.
+
+        ..
+           >>> from vcslinks.testing import dummy_weburl
+           >>> weburl = dummy_weburl()
+
+        >>> weburl.diff("dev")
+        'https://github.com/USER/PROJECT/compare/master...dev'
+        """
+        if not revision1:
+            revision1 = self.local_branch.remote_branch()
+        if permalink:
+            revision1 = self.repo.resolve_revision(revision1)
+            if revision2:
+                revision2 = self.repo.resolve_revision(revision2)
+        if not revision2:
+            revision2 = revision1
+            revision1 = "master"
+        rooturl = self.rooturl
+        if self.is_bitbucket():
+            return f"{rooturl}/branches/compare/{revision1}%0D{revision2}#diff"
+        else:
+            return f"{rooturl}/compare/{revision1}...{revision2}"
