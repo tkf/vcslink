@@ -123,7 +123,16 @@ class WebURL:
         if self.is_github():
             # https://github.com/{user}/{repo}/pull/new/{branch}
             return self.rooturl + "/pull/new/" + branch
-        raise NotImplementedError
+        elif self.is_gitlab():
+            # https://gitlab.com/{user}/{repo}/merge_requests/new?merge_request%5Bsource_branch%5D={dev}
+            return (
+                self.rooturl
+                + "/merge_requests/new?merge_request%5Bsource_branch%5D="
+                + branch
+            )
+        elif self.is_bitbucket():
+            # https://bitbucket.org/{user}/{repo}/pull-requests/new?source={branch}
+            return self.rooturl + "/pull-requests/new?source=" + branch
 
     def commit(self, revision: str) -> str:
         """

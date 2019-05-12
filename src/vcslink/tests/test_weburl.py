@@ -48,6 +48,52 @@ def test_github_url_variants(git_url):
     assert weburl.rooturl == "https://github.com/USER/PROJECT"
 
 
+def test_gitlab_file():
+    repo = DummyRepoAnalyzer()
+    repo.mock.remote_url.return_value = "git@gitlab.com:USER/PROJECT.git"
+    weburl = LocalBranch(repo).weburl()
+    rooturl = "https://gitlab.com/USER/PROJECT"
+    assert weburl.rooturl == rooturl
+
+    url = weburl.file("README.md")
+    assert url == f"{rooturl}/blob/master/README.md"
+
+    url = weburl.file("README.md", permalink=True)
+    assert re.match(f"^{rooturl}/blob/{SHA_RE_STR}/README.md$", url)
+
+    url = weburl.file("README.md", lines=1)
+    assert re.match(f"^{rooturl}/blob/{SHA_RE_STR}/README.md#L1$", url)
+
+    url = weburl.file("README.md", lines=(1, 2))
+    assert re.match(f"^{rooturl}/blob/{SHA_RE_STR}/README.md#L1-2$", url)
+
+    url = weburl.file("README.md", lines=(1, 2), permalink=False)
+    assert url == f"{rooturl}/blob/master/README.md#L1-2"
+
+
+def test_bitbucket_file():
+    repo = DummyRepoAnalyzer()
+    repo.mock.remote_url.return_value = "git@bitbucket.org:USER/PROJECT.git"
+    weburl = LocalBranch(repo).weburl()
+    rooturl = "https://bitbucket.org/USER/PROJECT"
+    assert weburl.rooturl == rooturl
+
+    url = weburl.file("README.md")
+    assert url == f"{rooturl}/src/master/README.md"
+
+    url = weburl.file("README.md", permalink=True)
+    assert re.match(f"^{rooturl}/src/{SHA_RE_STR}/README.md$", url)
+
+    url = weburl.file("README.md", lines=1)
+    assert re.match(f"^{rooturl}/src/{SHA_RE_STR}/README.md#lines-1$", url)
+
+    url = weburl.file("README.md", lines=(1, 2))
+    assert re.match(f"^{rooturl}/src/{SHA_RE_STR}/README.md#lines-1:2$", url)
+
+    url = weburl.file("README.md", lines=(1, 2), permalink=False)
+    assert url == f"{rooturl}/src/master/README.md#lines-1:2"
+
+
 @pytest.mark.parametrize(
     "git_url",
     [
