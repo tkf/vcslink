@@ -3,10 +3,6 @@ Welcome to vcslinks's documentation!
 
 .. currentmodule:: vcslinks
 
-
-High-level API
-==============
-
 .. autosummary::
    :nosignatures:
 
@@ -26,15 +22,6 @@ High-level API
 .. autofunction:: diff
 .. autofunction:: blame
 
-Low-level API
-=============
-
-.. autofunction:: analyze
-
-.. autoclass:: WebURL
-   :members:
-
-
 Indices and tables
 ==================
 
@@ -42,6 +29,7 @@ Indices and tables
    :maxdepth: 2
    :caption: Contents:
 
+   low-level-api
    vcsbrowse
 
 * :ref:`genindex`
