@@ -36,7 +36,7 @@ def rooturl(url):
     >>> rooturl("unsupported.host:some/remote/path")
     Traceback (most recent call last):
       ...
-    vcslink...UnsupportedURLError: Unsupported URL: unsupported.host:some/remote/path
+    vcslinks...UnsupportedURLError: Unsupported URL: unsupported.host:some/remote/path
     """
     return _specialurl(_rooturl(url))
 
@@ -113,7 +113,7 @@ class WebURL:
         Get a URL to the web page for submitting a PR.
 
         ..
-           >>> from vcslink.testing import dummy_weburl
+           >>> from vcslinks.testing import dummy_weburl
            >>> weburl = dummy_weburl()
 
         >>> weburl.pull_request()
@@ -139,7 +139,7 @@ class WebURL:
         Get a URL to commit page.
 
         ..
-           >>> from vcslink.testing import dummy_weburl
+           >>> from vcslinks.testing import dummy_weburl
            >>> weburl = dummy_weburl()
 
         >>> weburl.commit("master")
@@ -156,7 +156,7 @@ class WebURL:
         Get a URL to history page.
 
         ..
-           >>> from vcslink.testing import dummy_weburl
+           >>> from vcslinks.testing import dummy_weburl
            >>> weburl = dummy_weburl()
 
         >>> weburl.log()
@@ -200,7 +200,7 @@ class WebURL:
         Get a URL to file.
 
         ..
-           >>> from vcslink.testing import dummy_weburl
+           >>> from vcslinks.testing import dummy_weburl
            >>> weburl = dummy_weburl()
 
         >>> weburl.file("README.md")

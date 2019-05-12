@@ -1,2 +1,2 @@
-vcslink package
+vcslinks package
 ===============

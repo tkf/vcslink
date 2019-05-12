@@ -21,13 +21,13 @@ def dummy_file_content(fmt, nlines):
 
 @pytest.fixture(scope="session")
 def prepare_github_repository(tmp_path_factory):
-    path = tmp_path_factory.mktemp("vcslink-github")
+    path = tmp_path_factory.mktemp("vcslinks-github")
 
     def git(*args, **kwargs):
         cmd = [
             "git",
             "-c",
-            "user.email=dummy@vcslink",
+            "user.email=dummy@vcslinks",
             "-c",
             "user.name=Dummy VCS Links Tester",
         ]
