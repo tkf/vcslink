@@ -10,3 +10,12 @@ table.docutils {
 table.docutils td, table.docutils th {
     border: 0px;
 }
+
+dl.field-list > dt {
+    flex-basis: 10%;  /* default: 20%  */
+    min-width: 100px; /* required in case window width is too small */
+}
+
+dl.field-list > dd {
+    flex-basis: 85%;  /* default: 70%  */
+}
