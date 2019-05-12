@@ -1,9 +1,9 @@
-Welcome to vcslinks's documentation!
-====================================
-
 .. automodule:: vcslinks
 
 .. currentmodule:: vcslinks
+
+High-level API
+==============
 
 .. autosummary::
    :nosignatures:

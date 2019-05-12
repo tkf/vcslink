@@ -3,6 +3,20 @@
 
 |docs-latest| |build-status| |coveralls| |mypy| |black|
 
+`vcslinks` is a Python package for analyzing a local Git repository to
+find a URL for web pages in the hosted services like GitHub, GitLab,
+and Bitbucket.  For example, a permalink to the file ``setup.py`` with
+lines 5 to 10 highlighted can be obtained by
+
+..
+   >>> getfixture("patch_analyze")
+
+>>> import vcslinks
+>>> vcslinks.file("setup.py", lines=(5, 10))
+'https://github.com/USER/PROJECT/blob/55150afe539493d650889224db136bc8d9b7ecb8/setup.py#L5-L10'
+
+`vcslinks` also comes with command line program `vcsbrowse` for
+opening relevant pages of GitHub/GitLab/Bitbucket in web browser.
 
 .. |docs-latest|
    image:: https://img.shields.io/badge/docs-latest-blue.svg

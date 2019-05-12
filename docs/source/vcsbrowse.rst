@@ -1,6 +1,6 @@
-===================
- ``vcsbrowse`` CLI
-===================
+===============
+ ``vcsbrowse``
+===============
 
 .. argparse::
    :module: vcslinks.browse
