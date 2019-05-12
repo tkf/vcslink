@@ -1,8 +1,3 @@
-.. vcslinks documentation master file, created by
-   sphinx-quickstart on Sat May 11 19:30:14 2019.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 Welcome to vcslinks's documentation!
 ====================================
 
@@ -10,6 +5,13 @@ Welcome to vcslinks's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+API
+===
+
+.. autofunction:: vcslinks.analyze
+
+.. autoclass:: vcslinks.WebURL
+   :members:
 
 
 Indices and tables

@@ -6,3 +6,4 @@ __author__ = "Takafumi Arakaki"
 __license__ = "MIT"
 
 from .api import analyze
+from .weburl import WebURL
