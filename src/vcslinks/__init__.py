@@ -57,5 +57,18 @@ __version__ = "0.1.1.dev"
 __author__ = "Takafumi Arakaki"
 __license__ = "MIT"
 
+__all__ = [
+    "analyze",
+    "blame",
+    "commit",
+    "diff",
+    "file",
+    "log",
+    "pull_request",
+    "root",
+    "tree",
+    "WebURL",
+]
+
 from .api import analyze, blame, commit, diff, file, log, pull_request, root, tree
 from .weburl import WebURL

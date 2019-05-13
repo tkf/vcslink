@@ -108,9 +108,10 @@ def make_parser(doc=__doc__):
 
     def subp(command, func):
         doc = func.__doc__
-        title = None
-        for title in filter(None, map(str.strip, (doc or "").splitlines())):
-            break
+        try:
+            title = next(filter(None, map(str.strip, (doc or "").splitlines())))
+        except StopIteration:
+            title = None
         p = subparsers.add_parser(
             command, formatter_class=CustomFormatter, help=title, description=doc
         )
