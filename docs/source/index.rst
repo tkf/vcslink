@@ -13,6 +13,7 @@ High-level API
    commit
    log
    file
+   tree
    diff
    blame
 
@@ -21,6 +22,7 @@ High-level API
 .. autofunction:: commit
 .. autofunction:: log
 .. autofunction:: file
+.. autofunction:: tree
 .. autofunction:: diff
 .. autofunction:: blame
 

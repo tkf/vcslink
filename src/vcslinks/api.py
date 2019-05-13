@@ -3,10 +3,16 @@ from typing import Optional
 from .git import GitRepoAnalyzer, Pathish, choose_local_branch
 from .weburl import LinesSpecifier, WebURL
 
-PATH_DOC = """\
+PATH_DOC = """
         Path to a Git repository.  It can be a path to any file or
         directory inside the repository.  The root of the Git
         repository is found automatically by the ``git`` command.
+"""
+
+PERMALINK_DOC = """
+        Resolve the revisions in the *local* repository to a full
+        revision if `True`.  Use `revision` (e.g., ``master``) as-is
+        if `False`.
 """
 
 DEFAULT_DOCS = """
@@ -244,7 +250,7 @@ def file(
         highlighted if a `None` is passed.
     revision
         Git commit-ish.
-    permalink:
+    permalink
         Resolve the `revision` in the *local* repository to a full
         revision if `True`.  Use `revision` (e.g., ``master``) as-is
         if `False`.  If `None` (default), resolve `revision` if
@@ -252,6 +258,56 @@ def file(
     """
     return analyze(file, **kwargs).file(
         file, lines=lines, revision=revision, permalink=permalink
+    )
+
+
+def tree(
+    directory: Optional[Pathish] = None,
+    revision: Optional[str] = None,
+    permalink: bool = False,
+    **kwargs,
+):
+    """
+    Get a URL to tree page.
+
+    ..
+       >>> getfixture("patch_analyze")
+
+    **GitHub**
+
+    >>> import vcslinks
+    >>> vcslinks.tree()
+    'https://github.com/USER/PROJECT/tree/master'
+    >>> vcslinks.tree(revision="dev")
+    'https://github.com/USER/PROJECT/tree/dev'
+    >>> vcslinks.tree(permalink=True)
+    'https://github.com/USER/PROJECT/tree/55150afe539493d650889224db136bc8d9b7ecb8'
+
+    **GitLab**
+
+    >>> vcslinks.tree("path/to/gitlab/clone/SUBDIRECTORY")
+    'https://gitlab.com/USER/PROJECT/tree/master/SUBDIRECTORY'
+    >>> vcslinks.tree("path/to/gitlab/clone/SUBDIRECTORY", permalink=True)
+    'https://gitlab.com/USER/PROJECT/tree/55150afe539493d650889224db136bc8d9b7ecb8/SUBDIRECTORY'
+
+    **Bitbucket**
+
+    >>> vcslinks.tree("path/to/bitbucket/clone/SUBDIRECTORY")
+    'https://bitbucket.org/USER/PROJECT/src/master/SUBDIRECTORY'
+    >>> vcslinks.tree("path/to/bitbucket/clone/SUBDIRECTORY", permalink=True)
+    'https://bitbucket.org/USER/PROJECT/src/55150afe539493d650889224db136bc8d9b7ecb8/SUBDIRECTORY'
+
+    Parameters
+    ----------
+    directory
+        Path to a directory to be shown.
+    revision
+        Git commit-ish.
+    permalink
+        {PERMALINK_DOC}
+    """
+    return analyze(directory or ".", **kwargs).tree(
+        directory, revision=revision, permalink=permalink
     )
 
 
@@ -304,9 +360,7 @@ def diff(
         no revisions are given, the remote branch upstream to the
         current local branch is compared to the remote master.
     permalink
-        Resolve the revisions in the *local* repository to a full
-        revision if `True`.  Use `revision` (e.g., ``master``) as-is
-        if `False`.
+        {PERMALINK_DOC}
     path
         {PATH_DOC}
     {DEFAULT_DOCS}
@@ -352,8 +406,8 @@ def blame(
     )
 
 
-for f in [analyze, root, pull_request, commit, log, diff]:
+for f in [analyze, root, pull_request, commit, log, tree, diff]:
     f.__doc__ = f.__doc__.format(  # type: ignore
-        PATH_DOC=PATH_DOC, DEFAULT_DOCS=DEFAULT_DOCS
+        PATH_DOC=PATH_DOC, PERMALINK_DOC=PERMALINK_DOC, DEFAULT_DOCS=DEFAULT_DOCS
     )
 del f

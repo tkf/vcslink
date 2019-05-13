@@ -272,6 +272,31 @@ class WebURL:
         else:
             return f"{self.rooturl}/blob/{revision}/{relurl}{fragment}"
 
+    def tree(
+        self,
+        directory: Optional[Pathish] = None,
+        revision: Optional[str] = None,
+        permalink: bool = False,
+    ):
+        """
+        Get a URL to tree page.
+        """
+        if not revision:
+            revision = self.local_branch.remote_branch()
+        if permalink:
+            # TODO: This is wrong if `revision` in argument is `None`.
+            # The remote branch name is interpreted as a local branch
+            # name.  Fix it.
+            revision = self.repo.resolve_revision(revision)
+        if self.is_bitbucket():
+            baseurl = f"{self.rooturl}/src/{revision}"
+        else:
+            baseurl = f"{self.rooturl}/tree/{revision}"
+        if not directory:
+            return baseurl
+        relurl = "/".join(self.repo.relpath(directory).parts)
+        return f"{baseurl}/{relurl}"
+
     def diff(
         self,
         revision1: Optional[str] = None,

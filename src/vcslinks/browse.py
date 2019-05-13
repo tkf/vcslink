@@ -40,8 +40,10 @@ def cli_auto(app: Application, weburl: WebURL):
     """
     if weburl.local_branch.need_pull_request():
         url = weburl.pull_request()
-    else:
+    elif weburl.local_branch.remote_branch() == "master":
         url = weburl.rooturl
+    else:
+        url = weburl.tree()
     app.open_url(url)
 
 
