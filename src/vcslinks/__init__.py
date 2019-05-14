@@ -30,7 +30,7 @@ opening relevant pages of GitHub/GitLab/Bitbucket in web browser.
    :alt: PyPI - Python Version
 
 .. |commits-since|
-   image:: https://img.shields.io/github/commits-since/tkf/vcslinks/v0.1.0.svg?style=social
+   image:: https://img.shields.io/github/commits-since/tkf/vcslinks/v0.1.1.svg?style=social
    :target: https://github.com/tkf/vcslinks
    :alt: GitHub commits since tagged version
 
@@ -53,7 +53,7 @@ opening relevant pages of GitHub/GitLab/Bitbucket in web browser.
    :target: http://mypy-lang.org/
 """
 
-__version__ = "0.1.1.dev"
+__version__ = "0.1.1"
 __author__ = "Takafumi Arakaki"
 __license__ = "MIT"
 
