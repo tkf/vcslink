@@ -204,16 +204,22 @@ class WebURL:
 
         return f"#{fragment}"
 
+    def _remote_revision(self, revision: Optional[str], permalink: bool) -> str:
+        if permalink:
+            return self.repo.resolve_revision(revision or self.local_branch.name)
+        elif not revision:
+            # Now that we know that `revision` is not required to be
+            # resolved, we can safely return (unqualified) remote
+            # branch name:
+            return self.local_branch.remote_branch()
+        return revision
+
     def _file_revision(
         self, lines: LinesSpecifier, revision: Optional[str], permalink: Optional[bool]
     ) -> str:
         if permalink is None:
             permalink = lines is not None
-        if not revision:
-            revision = self.local_branch.remote_branch()
-        if permalink:
-            return self.repo.resolve_revision(revision)
-        return revision
+        return self._remote_revision(revision, permalink)
 
     def file(
         self,
@@ -281,13 +287,7 @@ class WebURL:
         """
         Get a URL to tree page.
         """
-        if not revision:
-            revision = self.local_branch.remote_branch()
-        if permalink:
-            # TODO: This is wrong if `revision` in argument is `None`.
-            # The remote branch name is interpreted as a local branch
-            # name.  Fix it.
-            revision = self.repo.resolve_revision(revision)
+        revision = self._remote_revision(revision, permalink)
         if self.is_bitbucket():
             baseurl = f"{self.rooturl}/src/{revision}"
         else:
