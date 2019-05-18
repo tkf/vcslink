@@ -70,7 +70,7 @@ class GitRepoAnalyzer(BaseRepoAnalyzer):
 
     def need_pull_request(self, branch):
         return not (
-            branch == "master" or self.git_config(f"branch.master.remote") == "origin"
+            branch == "master" or self.git_config(f"branch.{branch}.remote") == "origin"
         )
 
     def relpath(self, path: Pathish) -> Path:
