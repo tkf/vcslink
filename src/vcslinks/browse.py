@@ -8,8 +8,10 @@ import subprocess
 import sys
 import webbrowser
 from dataclasses import dataclass
+from pathlib import Path
 from typing import List
 
+from . import __version__
 from .api import analyze
 from .weburl import WebURL, parselines
 
@@ -100,6 +102,11 @@ class CustomFormatter(
 def make_parser(doc=__doc__):
     parser = argparse.ArgumentParser(
         formatter_class=CustomFormatter, description=__doc__
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"%(prog)s {__version__} from {Path(__file__).parent}",
     )
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--browser")
