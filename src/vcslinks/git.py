@@ -40,6 +40,12 @@ class GitRepoAnalyzer(BaseRepoAnalyzer):
     def git_config(self, config):
         return self.git("config", "--get", config).stdout.rstrip()
 
+    def try_git_config(self, config):
+        try:
+            return self.git_config(config)
+        except subprocess.CalledProcessError:
+            return
+
     def resolve_revision(self, revision):
         return self.git("rev-parse", "--verify", revision).stdout.strip()
 
@@ -51,8 +57,15 @@ class GitRepoAnalyzer(BaseRepoAnalyzer):
                     return url
         return url_list[0]
 
+    def remote_of_branch(self, branch):
+        return (
+            self.try_git_config(f"branch.{branch}.remote")
+            or self.try_git_config(f"branch.{branch}.pushRemote")
+            or self.try_git_config("remote.pushDefault")
+        )
+
     def remote_all_urls(self, branch="master"):
-        remote = self.git_config(f"branch.{branch}.remote")
+        remote = self.remote_of_branch(branch)
         return self.git(
             "config", "--get-all", f"remote.{remote}.url"
         ).stdout.splitlines()
@@ -61,7 +74,9 @@ class GitRepoAnalyzer(BaseRepoAnalyzer):
         return self.choose_url(self.remote_all_urls(**kwargs))
 
     def remote_branch(self, branch):
-        ref = self.git_config(f"branch.{branch}.merge")
+        ref = self.try_git_config(f"branch.{branch}.merge")
+        if not ref:
+            return branch  # assuming `pushRemote`
         assert ref.startswith("refs/heads/")
         return ref[len("refs/heads/") :]
 
@@ -69,9 +84,7 @@ class GitRepoAnalyzer(BaseRepoAnalyzer):
         return self.git("rev-parse", "--abbrev-ref", "HEAD").stdout.rstrip()
 
     def need_pull_request(self, branch):
-        return not (
-            branch == "master" or self.git_config(f"branch.{branch}.remote") == "origin"
-        )
+        return not (branch == "master" or self.remote_of_branch(branch) == "origin")
 
     def relpath(self, path: Pathish) -> Path:
         relpath = Path(path).absolute().relative_to(self.root)
