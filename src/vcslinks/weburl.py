@@ -108,6 +108,9 @@ class WebURL:
     def is_github(self):
         return "//github.com" in self.rooturl
 
+    def is_gitlab_wiki(self):
+        return re.search(r"//gitlab\.com/[^/]+/[^/]+/wikis", self.rooturl)
+
     def pull_request(self):
         """
         Get a URL to the web page for submitting a PR.
@@ -275,6 +278,14 @@ class WebURL:
         fragment = self._format_lines(lines)
         if self.is_bitbucket():
             return f"{self.rooturl}/src/{revision}/{relurl}{fragment}"
+        elif self.is_gitlab_wiki():
+            # TODO: handle `fragment`?
+            if relurl.endswith(".md"):
+                relurl = relurl[: -len(".md")]
+            if revision == "master":
+                return f"{self.rooturl}/{relurl}"
+            else:
+                return f"{self.rooturl}/{relurl}?version_id={revision}"
         else:
             return f"{self.rooturl}/blob/{revision}/{relurl}{fragment}"
 

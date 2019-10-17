@@ -51,6 +51,12 @@ def dummy_gitlab_repo() -> BaseRepoAnalyzer:
     return repo
 
 
+def dummy_gitlab_wiki_repo() -> BaseRepoAnalyzer:
+    repo = DummyRepoAnalyzer()
+    repo.mock.remote_url.return_value = "git@gitlab.com:USER/PROJECT.wiki.git"
+    return repo
+
+
 def dummy_bitbucket_repo() -> BaseRepoAnalyzer:
     repo = DummyRepoAnalyzer()
     repo.mock.remote_url.return_value = "git@bitbucket.org:USER/PROJECT.git"
@@ -63,6 +69,10 @@ def dummy_github_weburl() -> WebURL:
 
 def dummy_gitlab_weburl() -> WebURL:
     return LocalBranch(dummy_gitlab_repo()).weburl()
+
+
+def dummy_gitlab_wiki_weburl() -> WebURL:
+    return LocalBranch(dummy_gitlab_wiki_repo()).weburl()
 
 
 def dummy_bitbucket_weburl() -> WebURL:

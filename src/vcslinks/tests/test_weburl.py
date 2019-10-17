@@ -4,7 +4,12 @@ import pytest  # type: ignore
 
 from ..api import analyze
 from ..git import LocalBranch
-from ..testing import DummyRepoAnalyzer, dummy_bitbucket_weburl, dummy_gitlab_weburl
+from ..testing import (
+    DummyRepoAnalyzer,
+    dummy_bitbucket_weburl,
+    dummy_gitlab_weburl,
+    dummy_gitlab_wiki_weburl,
+)
 from ..weburl import UnsupportedURLError, rooturl
 
 SHA_RE_STR = "(?:[a-z0-9]{40})"
@@ -67,6 +72,30 @@ def test_gitlab_file():
 
     url = weburl.file("README.md", lines=(1, 2), permalink=False)
     assert url == f"{rooturl}/blob/master/README.md#L1-2"
+
+
+def test_gitlab_wiki_file():
+    weburl = dummy_gitlab_wiki_weburl()
+    rooturl = "https://gitlab.com/USER/PROJECT/wikis"
+    assert weburl.rooturl == rooturl
+
+    url = weburl.file("README.md")
+    assert url == f"{rooturl}/README"
+
+    url = weburl.file("README.md", permalink=True)
+    assert re.match(f"^{rooturl}/README\\?version_id={SHA_RE_STR}$", url)
+
+    url = weburl.file("README.md", lines=1)
+    assert re.match(f"^{rooturl}/README\\?version_id={SHA_RE_STR}$", url)
+    # can be better?
+
+    url = weburl.file("README.md", lines=(1, 2))
+    assert re.match(f"^{rooturl}/README\\?version_id={SHA_RE_STR}$", url)
+    # can be better?
+
+    url = weburl.file("README.md", lines=(1, 2), permalink=False)
+    assert url == f"{rooturl}/README"
+    # can be better?
 
 
 def test_bitbucket_file():
