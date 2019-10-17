@@ -87,7 +87,7 @@ class GitRepoAnalyzer(BaseRepoAnalyzer):
         return not (branch == "master" or self.remote_of_branch(branch) == "origin")
 
     def relpath(self, path: Pathish) -> Path:
-        relpath = Path(path).absolute().relative_to(self.root)
+        relpath = Path(path).resolve().relative_to(self.root)
         assert not str(relpath).startswith("..")
         return relpath
 
