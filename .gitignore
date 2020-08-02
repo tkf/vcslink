@@ -7,6 +7,7 @@
 /.tox
 /MANIFEST
 /build
+/coverage.xml
 /dist
 /docs/build
 /src/*.egg-info
