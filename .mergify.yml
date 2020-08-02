@@ -8,11 +8,6 @@ pull_request_rules:
     conditions:
       - base=master
       - "#approved-reviews-by>=1"
-      - status-success=Test Python 3.7
-      - status-success=Test Python 3.8
-      - status-success=Check style
-      - status-success=Check type
-      - status-success=Check docs
       - label=ready-to-merge:squash
       - label!=work-in-progress
     actions:
@@ -22,11 +17,6 @@ pull_request_rules:
     conditions:
       - base=master
       - "#approved-reviews-by>=1"
-      - status-success=Test Python 3.7
-      - status-success=Test Python 3.8
-      - status-success=Check style
-      - status-success=Check type
-      - status-success=Check docs
       - label=ready-to-merge:rebase
       - label!=work-in-progress
     actions:
@@ -36,11 +26,6 @@ pull_request_rules:
     conditions:
       - base=master
       - "#approved-reviews-by>=1"
-      - status-success=Test Python 3.7
-      - status-success=Test Python 3.8
-      - status-success=Check style
-      - status-success=Check type
-      - status-success=Check docs
       - label=ready-to-merge:merge
       - label!=work-in-progress
     actions:
@@ -50,11 +35,6 @@ pull_request_rules:
     conditions:
       - author=tkf
       - base=master
-      - status-success=Test Python 3.7
-      - status-success=Test Python 3.8
-      - status-success=Check style
-      - status-success=Check type
-      - status-success=Check docs
       - label~=ready-to-merge:.*
     actions:
       review: {}
