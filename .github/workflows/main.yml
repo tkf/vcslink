@@ -22,8 +22,29 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: ${{ matrix.python-version }}
-      - run: python -m pip install --upgrade tox
+      - run: python -m pip install --upgrade tox coveralls
       - run: python -m tox -e py
+      - name: Upload Coverage
+        run: coveralls
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COVERALLS_FLAG_NAME: ${{ matrix.python-version }}
+          COVERALLS_PARALLEL: true
+
+  # Finish parallel build
+  # https://coveralls-python.readthedocs.io/en/latest/usage/configuration.html#configuration
+  coveralls:
+    name: Finish Coveralls
+    needs: test
+    runs-on: ubuntu-latest
+    container: python:3-slim
+    steps:
+    - name: Finished
+      run: |
+        pip3 install --upgrade coveralls
+        coveralls --finish
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   check:
     runs-on: ubuntu-latest
