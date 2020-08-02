@@ -1,7 +1,7 @@
 `vcslinks`: Get URLs to commit/file/log/etc. pages in GitHub/GitLab/Bitbucket
 =============================================================================
 
-|docs-latest| |pypi| |build-status| |coveralls| |mypy| |black| |commits-since|
+|docs-latest| |pypi| |build-status| |codecov| |mypy| |black| |commits-since|
 
 `vcslinks` is a Python package for analyzing a local Git repository to
 find a URL for web pages in the hosted services like GitHub, GitLab,
@@ -41,6 +41,11 @@ opening relevant pages of GitHub/GitLab/Bitbucket in web browser.
 .. |coveralls|
    image:: https://coveralls.io/repos/github/tkf/vcslinks/badge.svg?branch=master
    :target: https://coveralls.io/github/tkf/vcslinks?branch=master
+   :alt: Test Coverage
+
+.. |codecov|
+   image:: https://codecov.io/gh/tkf/vcslinks/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/tkf/vcslinks
    :alt: Test Coverage
 
 .. |black|
