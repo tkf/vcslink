@@ -29,7 +29,7 @@ opening relevant pages of GitHub/GitLab/Bitbucket in web browser.
    :alt: PyPI - Python Version
 
 .. |commits-since|
-   image:: https://img.shields.io/github/commits-since/tkf/vcslinks/v0.1.1.svg?style=social
+   image:: https://img.shields.io/github/commits-since/tkf/vcslinks/v0.1.2.svg?style=social
    :target: https://github.com/tkf/vcslinks
    :alt: GitHub commits since tagged version
 
