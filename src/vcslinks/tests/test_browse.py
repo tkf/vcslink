@@ -1,6 +1,8 @@
 import shlex
 import sys
 
+import pytest  # type: ignore
+
 from ..browse import main
 
 
@@ -21,3 +23,11 @@ def test_smoke_browser(github_repository):
     # No-op command:
     browser = " ".join(map(shlex.quote, [sys.executable, "-c", ""]))
     main(["--browser", browser])
+
+
+def test_noremote(noremote_repository, capsys):
+    with pytest.raises(SystemExit) as excinfo:
+        main(["--dry-run"])
+    captured = capsys.readouterr()
+    assert excinfo.value.code == 1
+    assert "Branch `master` does not have remote." in captured.err

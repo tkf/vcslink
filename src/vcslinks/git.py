@@ -1,9 +1,17 @@
 import subprocess
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
-from .base import BaseRepoAnalyzer, Pathish
+from .base import ApplicationError, BaseRepoAnalyzer, Pathish
 from .weburl import WebURL
+
+
+class NoRemoteError(ApplicationError):
+    def __init__(self, branch: str):
+        self.branch = branch
+
+    def __str__(self):
+        return f"Branch `{self.branch}` does not have remote."
 
 
 class GitRepoAnalyzer(BaseRepoAnalyzer):
@@ -37,14 +45,14 @@ class GitRepoAnalyzer(BaseRepoAnalyzer):
     def git(self, *args, **options):
         return self.run("git", *args, **options)
 
-    def git_config(self, config):
+    def git_config(self, config: str) -> str:
         return self.git("config", "--get", config).stdout.rstrip()
 
-    def try_git_config(self, config):
+    def try_git_config(self, config: str) -> Optional[str]:
         try:
             return self.git_config(config)
         except subprocess.CalledProcessError:
-            return
+            return None
 
     def resolve_revision(self, revision):
         return self.git("rev-parse", "--verify", revision).stdout.strip()
@@ -57,18 +65,21 @@ class GitRepoAnalyzer(BaseRepoAnalyzer):
                     return url
         return url_list[0]
 
-    def remote_of_branch(self, branch):
+    def remote_of_branch(self, branch: str) -> Optional[str]:
         return (
             self.try_git_config(f"branch.{branch}.remote")
             or self.try_git_config(f"branch.{branch}.pushRemote")
             or self.try_git_config("remote.pushDefault")
         )
 
-    def remote_all_urls(self, branch="master"):
-        remote = self.remote_of_branch(branch)
-        return self.git(
-            "config", "--get-all", f"remote.{remote}.url"
-        ).stdout.splitlines()
+    def remote_all_urls(self, branch: str = "master") -> List[str]:
+        remote: str = self.remote_of_branch(branch) or "origin"
+        try:
+            return self.git(
+                "config", "--get-all", f"remote.{remote}.url"
+            ).stdout.splitlines()
+        except subprocess.CalledProcessError:
+            raise NoRemoteError(branch)
 
     def remote_url(self, **kwargs):
         return self.choose_url(self.remote_all_urls(**kwargs))

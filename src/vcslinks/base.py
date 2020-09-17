@@ -5,6 +5,10 @@ from typing import Union
 Pathish = Union[str, Path]
 
 
+class ApplicationError(Exception):
+    returncode: int = 1
+
+
 class BaseRepoAnalyzer(ABC):
     @abstractmethod
     def current_branch(self):

@@ -1,10 +1,22 @@
 import os
 from contextlib import contextmanager
 from subprocess import run
+from typing import TYPE_CHECKING, Sequence
 
 import pytest  # type: ignore
 
 from .testing import dummy_bitbucket_repo, dummy_github_repo, dummy_gitlab_repo
+
+if TYPE_CHECKING:
+    from typing import Final
+
+GIT_COMMAND_BASE: "Final[Sequence[str]]" = [
+    "git",
+    "-c",
+    "user.email=dummy@vcslinks",
+    "-c",
+    "user.name=Dummy VCS Links Tester",
+]
 
 
 @contextmanager
@@ -26,13 +38,7 @@ def prepare_github_repository(tmp_path_factory):
     path = tmp_path_factory.mktemp("vcslinks-github")
 
     def git(*args, **kwargs):
-        cmd = [
-            "git",
-            "-c",
-            "user.email=dummy@vcslinks",
-            "-c",
-            "user.name=Dummy VCS Links Tester",
-        ]
+        cmd = list(GIT_COMMAND_BASE)
         cmd.extend(args)
         return run(cmd, check=True, cwd=str(path), **kwargs)
 
@@ -50,6 +56,29 @@ def prepare_github_repository(tmp_path_factory):
 @pytest.fixture
 def github_repository(prepare_github_repository):
     with chdir(prepare_github_repository) as path:
+        yield path
+
+
+@pytest.fixture(scope="session")
+def prepare_noremote_repository(tmp_path_factory):
+    path = tmp_path_factory.mktemp("vcslinks-noremote")
+
+    def git(*args, **kwargs):
+        cmd = list(GIT_COMMAND_BASE)
+        cmd.extend(args)
+        return run(cmd, check=True, cwd=str(path), **kwargs)
+
+    git("init")
+    (path / "README.md").write_text(dummy_file_content("README.md: line {n}", 5))
+    git("add", "README.md")
+    git("commit", "--message", "Add README.md")
+
+    return path
+
+
+@pytest.fixture
+def noremote_repository(prepare_noremote_repository):
+    with chdir(prepare_noremote_repository) as path:
         yield path
 
 

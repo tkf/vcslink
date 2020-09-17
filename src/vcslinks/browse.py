@@ -13,6 +13,7 @@ from typing import List
 
 from . import __version__
 from .api import analyze
+from .base import ApplicationError
 from .weburl import WebURL, parselines
 
 
@@ -196,6 +197,9 @@ def main(args=None):
     ns = parser.parse_args(args)
     try:
         Application.run(**vars(ns))
+    except ApplicationError as err:
+        print(err, file=sys.stderr)
+        sys.exit(err.returncode)
     except subprocess.CalledProcessError as err:
         print(err, file=sys.stderr)
         print_outputs(err)
