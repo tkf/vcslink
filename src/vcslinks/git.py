@@ -1,23 +1,24 @@
 import subprocess
 from pathlib import Path
-from typing import List, Optional
+from subprocess import CompletedProcess
+from typing import TYPE_CHECKING, List, Optional, Sequence
 
 from .base import ApplicationError, BaseRepoAnalyzer, Pathish
 from .weburl import WebURL
 
+if TYPE_CHECKING:
+    from typing import Final
+
 
 class NoRemoteError(ApplicationError):
     def __init__(self, branch: str):
-        self.branch = branch
+        self.branch: "Final[str]" = branch
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Branch `{self.branch}` does not have remote."
 
 
 class GitRepoAnalyzer(BaseRepoAnalyzer):
-    cwd: Path
-    root: Path
-
     @classmethod
     def from_path(cls, path: Pathish) -> "GitRepoAnalyzer":
         cwd = Path(path)
@@ -25,11 +26,13 @@ class GitRepoAnalyzer(BaseRepoAnalyzer):
             cwd = cwd.parent
         return cls(cwd=cwd)
 
-    def __init__(self, cwd):
-        self.cwd = Path(cwd)
-        self.root = Path(self.git("rev-parse", "--show-toplevel").stdout.strip())
+    def __init__(self, cwd: Pathish):
+        self.cwd: "Final[Path]" = Path(cwd)
+        self.root: "Final[Path]" = Path(
+            self.git("rev-parse", "--show-toplevel").stdout.strip()
+        )
 
-    def run(self, *args, **options):
+    def run(self, *args: str, **options) -> CompletedProcess:
         kwargs = dict(
             cwd=str(self.cwd),
             check=True,
@@ -40,9 +43,9 @@ class GitRepoAnalyzer(BaseRepoAnalyzer):
             universal_newlines=True,
         )
         kwargs.update(options)
-        return subprocess.run(args, **kwargs)
+        return subprocess.run(args, **kwargs)  # type: ignore
 
-    def git(self, *args, **options):
+    def git(self, *args: str, **options) -> CompletedProcess:
         return self.run("git", *args, **options)
 
     def git_config(self, config: str) -> str:
@@ -54,11 +57,11 @@ class GitRepoAnalyzer(BaseRepoAnalyzer):
         except subprocess.CalledProcessError:
             return None
 
-    def resolve_revision(self, revision):
+    def resolve_revision(self, revision: str) -> str:
         return self.git("rev-parse", "--verify", revision).stdout.strip()
 
     @staticmethod
-    def choose_url(url_list):
+    def choose_url(url_list: Sequence[str]) -> str:
         for host in ["gitlab", "github", "bitbucket"]:
             for url in url_list:
                 if host in url:
@@ -81,20 +84,20 @@ class GitRepoAnalyzer(BaseRepoAnalyzer):
         except subprocess.CalledProcessError:
             raise NoRemoteError(branch)
 
-    def remote_url(self, **kwargs):
-        return self.choose_url(self.remote_all_urls(**kwargs))
+    def remote_url(self, branch: str = "master") -> str:
+        return self.choose_url(self.remote_all_urls(branch))
 
-    def remote_branch(self, branch):
+    def remote_branch(self, branch: str) -> str:
         ref = self.try_git_config(f"branch.{branch}.merge")
         if not ref:
             return branch  # assuming `pushRemote`
         assert ref.startswith("refs/heads/")
         return ref[len("refs/heads/") :]
 
-    def current_branch(self):
+    def current_branch(self) -> str:
         return self.git("rev-parse", "--abbrev-ref", "HEAD").stdout.rstrip()
 
-    def need_pull_request(self, branch):
+    def need_pull_request(self, branch: str) -> bool:
         return not (branch == "master" or self.remote_of_branch(branch) == "origin")
 
     def relpath(self, path: Pathish) -> Path:
@@ -126,7 +129,7 @@ class LocalBranch:
         return WebURL(self)
 
 
-def is_supported_url(url):
+def is_supported_url(url: str) -> bool:
     # TODO: improve!
     for host in ["gitlab", "github", "bitbucket"]:
         if host in url:

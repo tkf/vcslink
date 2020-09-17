@@ -17,7 +17,7 @@ class UnsupportedURLError(ValueError):
         return f"Unsupported URL: {self.url}"
 
 
-def rooturl(url):
+def rooturl(url: str) -> str:
     """
     Turn Git `url` to something web browsers recognize.
 
@@ -41,7 +41,7 @@ def rooturl(url):
     return _specialurl(_rooturl(url))
 
 
-def _rooturl(url):
+def _rooturl(url: str) -> str:
     match = re.match(r"^https?://(.*?)(.git)?$", url)
     if match:
         return f"https://{match.group(1)}"
@@ -59,7 +59,7 @@ def _rooturl(url):
     return f"https://{host}/{path}"
 
 
-def _specialurl(url):
+def _specialurl(url: str) -> str:
     host, path = url.split("://", 1)[1].split("/", 1)
     if "gitlab" in host and path.endswith(".wiki"):
         return f"https://{host}/{path[:-len('.wiki')]}/wikis"
@@ -111,7 +111,7 @@ class WebURL:
     def is_gitlab_wiki(self):
         return re.search(r"//gitlab\.com/[^/]+/[^/]+/wikis", self.rooturl)
 
-    def pull_request(self):
+    def pull_request(self) -> Optional[str]:
         """
         Get a URL to the web page for submitting a PR.
 
@@ -142,6 +142,7 @@ class WebURL:
         elif self.is_bitbucket():
             # https://bitbucket.org/{user}/{repo}/pull-requests/new?source={branch}
             return self.rooturl + "/pull-requests/new?source=" + branch
+        return None
 
     def commit(self, revision: str) -> str:
         """
@@ -294,7 +295,7 @@ class WebURL:
         directory: Optional[Pathish] = None,
         revision: Optional[str] = None,
         permalink: bool = False,
-    ):
+    ) -> str:
         """
         Get a URL to tree page.
         """

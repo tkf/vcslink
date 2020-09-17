@@ -88,7 +88,7 @@ def root(*, path: Pathish = ".", **kwargs) -> str:
     return analyze(path, **kwargs).rooturl
 
 
-def pull_request(path: Pathish = ".", **kwargs) -> str:
+def pull_request(path: Pathish = ".", **kwargs) -> Optional[str]:
     """
     Get a URL to the web page for submitting a PR.
 
@@ -266,7 +266,7 @@ def tree(
     revision: Optional[str] = None,
     permalink: bool = False,
     **kwargs,
-):
+) -> str:
     """
     Get a URL to tree page.
 
